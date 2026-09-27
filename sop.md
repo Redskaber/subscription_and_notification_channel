@@ -1,6 +1,6 @@
 # 项目阶段推进与质量管控流程
 
-> **Version**: v14.0-modernized — modernization pass over v13.22 (r139). Removes effect-theory philosophical ballast (§2.2 原则 45-52 + §21.12 items 14-21, all marked 零载荷 — zero implementation payload); modernizes S-expr framing to neutral "bootstrap-parser scaffold" terminology (§2.2 原则 31/41/58, §21.12 item 27, §10.5); adds §2.5 Modern Compiler-Practice Integration Discipline (MLIR/Pratt/parser-combinators/typed AST/PBT/golden/fuzz/salsa/dataflow/Cranelift-JIT/snapshot). Full v13.0-v13.22 changelog retained in git history (commit at v13.22); v14.0 diff appendix at end of this document. Source document: sop.md v13.22 (r139), 3828 lines.
+> **Version**: v15.0-verified — 本版 = v14.0-modernized 基础 + v14.1-refined + v14.2-research-backed + v14.3-closure-discipline + v14.4-iterative-closure 四 addendum + v15.0-verified 主文件级收敛（MUV-E 治理审查驱动：Version 头/§16.1 表/D8.x-y-z 落表/过早结束标记四项 P0 物理修复 + S-expr 术语残留 2 处中性化注记 + §21.12 第 32 条知识重验纪律 + §8.4.5 新查询行 + v16 变更日志行——六项用户要求裁定中三项转通过的前提修复）。历史：v14.0-modernized 对 v13.22 (r139) 的现代化 pass（移除效应理论哲学链 §2.2 原则 45-52 + §21.12 第 14-21 条零载荷；S-expr 表述中性化为 bootstrap-parser scaffold；新增 §2.5 现代编译流程接入纪律）。Full v13.0-v13.22 changelog retained in git history; v14.0-v15.0 diff appendices at end of this document. Source: sop.md v13.22 (r139), 3828 lines.
 > **Purpose**: 为项目提供清晰、严格、高效、可协调的阶段推进与质量管控 SOP。任何 Agent 拿到本文档即可：**清晰**知道每个阶段/轮次/角色的输入输出与验收标准；**严格**知道哪些是硬性阻断、哪些可酌情；**高效**知道哪些可并行、哪些必须串行、何时可提前收敛；**可协调**知道跨 Agent 协作协议（Task ID / worklog / 升级路径）。
 > **开发语言**: Rust
 > **目标语言**: kerf（占位名称，可全局替换）
@@ -1245,6 +1245,7 @@ docs/lang-design/
 | 流特性理论/流本体论（五层特性/完备观测谱/固定vs确定维度阶/多维可能性/随机种子=自由度对偶/弦理论 Tier 3 + T 对偶驳回/时间性语义重述/8 原语第十一轮验证） | `docs/lang-design/17-principles.md` 原则 56 + `docs/lang-design/06-operational-semantics.md` §14 + `docs/lang-design/13-capability-matrix.md` §3.20 + `docs/lang-design/21-capability-architecture.md` §11.5 + `docs/lang-design/24-space-decomposition.md` §23 + `docs/lang-design/05-runtime.md` §14 + `docs/lang-design/12-roadmap.md` §2.17 + `docs/lang-design/19-references.md` §28 + `docs/lang-design/18-terminology.md` §5w | 流特性理论与流本体论设计查询的第一入口；stage0.md v8.6 §9.28 为全量权威（FLW-A..FLW-G 七裁定）；原则 48 K-A 分级 + 原则 49 CAP-C 对偶面 + 原则 52 观测维度阶的交汇条款在此查询 |
 | 统一流分析/描述论本体论（借用检查=流干涉投影/π_time 投影家族三实例/EBNF 第十源语料 Level 1-4 登记态/五描述修正表/机制层豁免/哥德尔不完备同构/三重不完备统一/8 原语第十二轮验证） | `docs/lang-design/17-principles.md` 原则 57 + `docs/lang-design/02-syntax-model.md` §8.13.2a + `docs/lang-design/06-operational-semantics.md` §15 + `docs/lang-design/13-capability-matrix.md` §3.21 + `docs/lang-design/05-runtime.md` §15 + `docs/lang-design/12-roadmap.md` §2.18 + `docs/lang-design/24-space-decomposition.md` §24 + `docs/lang-design/19-references.md` §29 + `docs/lang-design/18-terminology.md` §5x（stage0.md v8.7 §9.29 全量权威——r115 吸收轮） |
 | 递归处理/脚手架拆除对账（四层实况谱系：Reader 256 帽/HM 迭代 512 预算/VM 堆帧栈/eval 前置覆盖；理论统一 = 叙事层 K-F 沿袭；方案 2/4 = 登记态备选；零语法面；S-expr 拆除时点 = 步⑤ E5 收口；拆除边界 = 生产链+语料面 + 种子链保留宪制） | `docs/lang-design/17-principles.md` 原则 58 + `docs/lang-design/04-bytecode-vm.md` §3.1 + `docs/lang-design/07-bootstrap-strategy.md` §3.2.2 + `docs/lang-design/06-operational-semantics.md` §16 + `docs/lang-design/13-capability-matrix.md` §3.22 + `docs/lang-design/12-roadmap.md` §2.19 + `docs/lang-design/19-references.md` §30 + `docs/lang-design/18-terminology.md` §5y（stage0.md v8.8 §9.30 全量权威——r117 吸收轮） |
+| 知识重验/裁定收紧（72 问全量重验：54 检索锚 + 修正 15 条 C1-C15 + 降格 13 条 + GD-1 one-shot 裁定 + GD-2 逃生舱永久保留 + 自评分清零纪律 + supersession 回溯生效） | `kerf-docs/qa/QA-MASTER-INDEX.md` + `kerf-docs/qa/qa-cluster-1/2/3` 三卷 + `stage0.md v9.7 §9.40`（全量权威——第四十轮吸收） | 知识重验纪律第一入口：每五轮设计讨论吸收至少执行一次全量重验；修正裁定回溯生效（被修正主张的后续引用以 QA-MASTER-INDEX 裁定为准）；§21.12 第 32 条为治理面承接 |
 | 临时借用（脚手架）登记/拆除判据/调试策略 | `docs/lang-design/12-roadmap.md` §2.11 + `docs/lang-design/11-testing.md` §5 | 三种脚手架生命周期（语法/信任/优化——搭建/使用/拆除 Stage + 拆除判据 ≥98% 或额外能力 + 可回滚——原则 41 落地规范）+ 双向调试策略（模式识别器双重用途 + 五级调试视图——Stage 2+ 设计登记态） |
 | Agent 冷启动 / 查流程历史 / 查某裁定何时做出 | `docs/worklog/l`（rec 树根路由） | 未压实区间 + 里程碑/批次导航 + by-topic 决策视图（§8.6.3-§8.6.4 三原语） |
 | 库表面命名/新内置函数命名 | `docs/lang-design/20-surface-conventions.md` | R1-R6 六规则 + 57 项映射表 + 新语料现代名纪律（原则 33 落地规范） |
@@ -2395,6 +2396,14 @@ flowchart TD
 - 缺漏路径：...
 - 补测计划：...
 
+**D8.x 死岛检测子项**（v14.2 落位 / v15.0 物理落表修正——原 addendum 中「D7.x」编号错位，实际归属 D8 管线路径覆盖维度）：新增 §9.x/原则/条款时执行死岛扫描三件套（trigger/consumer/test 三闸门——§2.2 原则 60 四闸门含 self-check）；违反 = 死岛（DEA-2 判据）。
+
+**D8.y 完整闭合子项**（v14.3 落位 / v15.0 物理落表修正——原「D7.y」）：静态 registration-time 6 节点链登记（declaration/interface/consumer/test/diagnostic/governance surface——§2.2 原则 61 六闸门）。
+
+**D8.z 持续闭合重验子项**（v14.4 落位 / v15.0 物理落表修正——原「D7.z」）：动态 round-level 重验三件套（重验既有 6 节点链完整性 + 为新内容注册 6 节点链 + 扫描新死岛——§2.2 原则 62 三件套五闸门）。
+
+> **v15.0 编号修正注记**：v14.2/v14.3/v14.4 addendum 正文中所有「D7.x / D7.y / D7.z」引用，自本轮起一律读作「D8.x / D8.y / D8.z」（D7 = 文档与知识传承维度，不承载管线路径覆盖子项——错位根因：addendum 时代将「管线路径覆盖」误记为 D7）。
+
 ## 3. 委员会投票
 | 角色 | 投票 | 理由 |
 |------|------|------|
@@ -3061,6 +3070,12 @@ flowchart TD
 
 | 版本 | 日期 | 变更内容 | 作者 |
 |------|------|---------|------|
+| **v15.0** | 2026-09-27 | 主文件级收敛与治理审查修复（MUV-E 驱动）：① Version 头 v14.0→v15.0（四 addendum 时代「插入表头后」声明首次物理执行）；② §16.1 表补 v14.0-v14.1-v14.2-v14.3-v14.4 五行（同上根因）；③ §14 D8 节物理落表 D8.x 死岛检测/D8.y 完整闭合/D8.z 持续闭合重验三子项（修正 v14.2-v14.4 addendum 中「D7.x/y/z」的编号错位——管线路径覆盖实为 D8；D7=文档与知识传承不涉）；④ 行 3907 过早「文档结束」标记加接续注记（主文件 v12.0 口径结束位——addendum 接续于后）；⑤ §8.4.5 新增知识重验/裁定收紧查询行；⑥ §21.12 新增第 32 条知识重验纪律。六项裁定（完整/精炼/旧思想清除/死岛/路由闭合/节点链上）：P0×2 修复后完整性与节点链上转通过；死岛 14 项中 1 项自我指涉死岛（D7→D8 错位）本轮修复，其余 13 项为 addendum 层引用链待后续收敛；精炼机会 ~700±200 行登记不强制执行。 | Z.ai Code (MUV-E/F) |
+| **v14.4** | 2026-09-26 | iterative-closure addendum：§2.2 原则 62 持续闭合重验纪律三件套 + §21.12 第 31 条 + §2.5.11 设计逻辑覆盖完整性纪律 4 子节 + 附录 E v5 设计逻辑覆盖矩阵（12/12 §8 能力模型全覆盖）。v5 orchestrator 10 主题 web-search 研究（6 有效 + 4 全噪声回退）。 | Super Z (v5 orchestrator) |
+| **v14.3** | 2026-09-25 | closure-discipline addendum：§2.2 原则 61 完整闭合纪律 6 节点链 + §21.12 第 30 条 + §2.5.10 设计逻辑补充纪律 + 附录 D v4 8 项设计逻辑项总表。v4 研究 10 主题（gc/vm/hm/trait/polonius/ssa/error-recovery/mono）。 | Super Z (v4 orchestrator) |
+| **v14.2** | 2026-09-24 | research-backed addendum：§2.5.9 v3 研究背书 CONCRETE 依赖注册 10 子节 + §2.2 原则 60 死岛检测纪律四闸门 + §21.12 第 29 条 + 附录 C。v3 orchestrator 10 主题 web-search。 | Super Z (v3 orchestrator) |
+| **v14.1** | 2026-09-23 | refined addendum：§2.5.8 next24 诚实化接入纪律 4 子节（macro_rules! 限制/增量编译难题/时间表诚实/阶段适配判据）+ §2.2 原则 59 + §21.12 第 28 条 + 附录 B。 | Super Z (v14.1 refiner) |
+| **v14.0** | 2026-09-22 | modernized 主文件：移除效应理论哲学链（§2.2 原则 45-52 + §21.12 第 14-21 条——零载荷）+ S-expr 表述中性化（bootstrap-parser scaffold）+ 新增 §2.5 现代编译流程接入纪律（MLIR/Pratt/parser-combinators/typed AST/PBT/golden/fuzz/salsa/dataflow/Cranelift-JIT/snapshot）+ 附录 A 现代化对照。 | Super Z (v14.0 modernizer) |
 | **v13.22** | 2026-11-11 | 英语编码统一窗（r139 / 209-a..209-f——用户四链指令「检查当前项目中的编码语言，使用单一英语编码，将错误提示标准化，并将『单一编码语言首选-英语』添加到 docs/sop.md 中 + 继续推进目标语言设计的实现窗 + 按推荐先后任务顺序继续推进 + 完整打包 tar.gz + 同步完整更新 web page」驱动，M1 指令开窗第四十四例——r112 注释语言标准轮同型第 2 例）：① §10.5 由「注释语言标准」升格为「单一编码语言标准——首选英语」——四层覆盖{注释层 r112 沿袭 + 错误提示层 r139 新增[E00xx 诊断族/Reader/Expander/Compiler/VM/Driver/bootstrap 双侧消息——r112 双豁免位错误消息豁免撤销，用户指令明文「将错误提示标准化」] + 开发面消息层 r139 新增[panic/expect/assert/测试断言锚/审计期望面] + CLI 输出面 r139 新增[usage/check/test 报告]}；豁免位收窄{设计文档维持 + Unicode 能力测试夹具登记制白名单[以 CJK 文本为被测对象本身——Reader 字面量往返/字符串全序码点/test runner Unicode 截断边界] + worklog/归档脚本历史工件}；消息层形态标准{Rust 编译器惯例——小写开头/无句尾句号/「X」→`X` 反引号/全角转 ASCII/占位符逐位保留}；双语侧字节级一致义务{单源字典——同一中文原文恒得同一英文译文，parity 守护前提}；存量治理增 r139 第二轮实录{~5.9K 字面量字典驱动 + 测试/审计期望锁步 + r138 滞留审计锚 A09/P03 同窗清偿}；② §10.2 清单新增末项（非英文错误提示/诊断消息/CLI 输出检查）。同步面：代码域错误提示/开发面/CLI 面全量英文化（148 文件 ~5.9K 字面量——单源字典四轮迭代 + 空格/引号/转义边界修复 + 语义不变纪律——测试计数 1724 逐位维持）。 | Super Z (main) |
 | **v13.21** | 2026-10-30 | 第二十九轮递归处理与脚手架拆除对账反哺（r117 / 187-a..187-e——用户五链段式指令「next21.md 设计理念原则演进内容吸收融入 stage0.md 直至收敛 → 融入 lang-design 对 next21.md 全部问题系统性全面审查直至收敛 → 反哺 stage0.md 二次整理 → 反哺 sop.md → 完整打包 tar.gz + web page + t3plus 同步更新」驱动，#15 讨论主线第十九次用户行权[设计讨论吸收轮——纯文档域零代码变更零语法增量] + M1 指令开窗第二十二例——沿 r111/r113/r115 先例形态）：① §2.2 设计原则由五十七条扩为五十八条（新增第 58 条「同形树递归处理纪律」——r117 吸收链 stage0.md v8.8 §9.30 → lang-design/17 v7.19 镜像 → 本版）② §21.12 新增第 27 条（同形树递归处理纪律：四层实况谱系/理论统一叙事层/备选谱系登记态/零语法面/脚手架拆除对账五项）③ §8.4.5 查询时机表新增递归处理/脚手架拆除对账行（17 原则 58 + 04 §3.1 + 07 §3.2.2 + 06 §16 + 13 §3.22 + 12 §2.19 + 19 §30 + 18 §5y 八锚）④ 目录/§2.2 标题/来源注五十七→五十八计数同步（stage0.md v8.7→v8.8 锚同步）。同步面：stage0.md v8.7→v8.8（**§9.30 S 表达式递归处理与脚手架拆除对账六小节**[REC-A..REC-C 三裁定——同形树递归处理四层实况谱系{Reader 256 帽/HM 迭代 512 预算/VM 堆帧栈/eval 前置覆盖} + 理论统一 = 解释框架层叙事{K-F 零机制变更} + 漂移检测八项实况修正{时态漂移——切换窗步③ 4/4 已落 E1-β；IR 层级口径——VM 路径四层 + Stx 必需承载；拆除边界宪制} + 脚手架生命周期五段 ↔ 切换窗五步映射 + **8 原语不变性第十三轮验证**{零新原语零通道零 VM 零语法——历次最轻量轮族并列} + 原创贡献零新增{累计维持 25 项——语料 = 既有原则/实况/计划的理论确认}] + 原则 58 + 附录 A 十二条/E.30 四条[Rust 社区递归防护共识 + OCaml 5 效应处理器堆栈策略 + matklad 事件流解析 + 自举脚手架拆除谱系——四项 web-search 实检索证 r117-q1~q4 存档 tool-results/r117-search/]/F.24）+ lang-design **九件**修订（17 v7.19[原则 58 + 附二十四] / 18 v7.23 §5y / 19 v7.15 §30 / 04 v5.5 §3.1[递归处理实况注记] / 07 v7.1 §3.2.2[脚手架生命周期映射] / 06 v6.12 §16[递归流形叙事注记] / 13 v6.24 §3.22[递归深度处理能力面] / 12 v6.30 §2.19[脚手架拆除时点] / 00 v6.24）+ 十六件零增量维持（02 号件零触碰 = **v9 定稿域零扰动实证——本轮零语法面与第十源语料轮的差异登记**：递归处理 = 防御机制非语法面故无 §8.13.2a 类增量登记位需求）。**递归处理线程统一登记**（FS-1/A6/TD-023 既有交付 → 四层谱系原则化 + 脚手架线程语法面实例化对账[原则 41] + 切换窗理论重述收编）。 | Super Z (main) |
 | **v13.20** | 2026-10-28 | 第二十八轮统一流分析与描述论反哺（r115 / 185-a..185-e——用户双链六段式指令「next20.md 设计理念原则演进内容吸收融入 stage0.md 直至收敛 → 融入 lang-design 对 next20.md 全部问题系统性全面审查直至收敛 → 反哺 stage0.md 二次整理 → 反哺 sop.md → 完整打包 tar.gz + web page + t3plus 同步更新；并行链——next.md-next20.md EBNF 内容整合[r104 v9 定稿既有基线 + 本轮第十源语料增量登记]」驱动，#15 讨论主线第十八次用户行权[设计讨论吸收轮——纯文档域零代码变更] + M1 指令开窗第二十例——沿 r111/r113 先例形态）：① §2.2 设计原则由五十六条扩为五十七条（新增第 57 条「统一流分析与描述论登记纪律」——r115 吸收链 stage0.md v8.7 §9.29 → lang-design/17 v7.18 镜像 → 本版）② §21.12 新增第 26 条（统一流分析与描述论登记纪律：分析线程工程统一面/EBNF 第十源语料登记态/描述论立场层{机制层豁免}/哥德尔同构{三重不完备统一}/零载荷五项）③ §8.4.5 查询时机表新增统一流分析/描述论本体论行（17 原则 57 + 02 §8.13.2a + 06 §15 + 13 §3.21 + 05 §15 + 12 §2.18 + 24 §24 + 19 §29 + 18 §5x 九锚）④ 目录/§2.2 标题/来源注五十六→五十七计数同步（stage0.md v8.6→v8.7 锚同步）。同步面：stage0.md v8.6→v8.7（**§9.29 统一流分析与描述论本体论八小节**[UFA-A..UFA-F 六裁定——统一流分析 = 借用检查投影化工程统一面{π_time 投影家族第三实例 + 四相位管线 + 四超越优势分级} + EBNF 第十源语料 Level 1-4 登记态{七件语法族 + ~32 关键字全脱糖 + 记法修正五处 + 六规则族} + 描述论立场层{五描述修正表 + 机制层豁免 + OSR 锚 E.29-163} + 哥德尔不完备同构{间隙性↔第一定理/自举信任根↔第二定理 + 三重不完备统一叙事层} + **8 原语不变性第十二轮验证**{零新原语零通道零 VM——历次第二轻量轮族} + 原创贡献 #23/#24/#25 三项新登记{累计 25 项} + 环数维持 12 环{本体层+立场层双基座} + 漂移检测十项实况修正] + 原则 57 + 附录 A 二十二条/E.29 四条[Polonius + Koka Perceus + 哥德尔-图灵-Rice 家族 + OSR/Ladyman——四项 web-search 实检索证 r115-q1~q4 存档 tool-results/r115-search/]/F.23）+ lang-design **十件**修订（17 v7.18[原则 57 + 附二十三 + R4 顺修一处{头部导语「四十六条」9 轮陈旧残留}] / 18 v7.22 §5x / 19 v7.14 §29 / 02 v7.10 §8.13.2a / 06 v6.11 §15 / 13 v6.23 §3.21 / 05 v6.13 §15 / 12 v6.29 §2.18 / 24 v2.12 §24 / 00 v6.23）+ 十五件零增量维持（02 §8.13 v9 定稿位维持不动 = 定稿域零扰动实证）。**分析线程工程统一面开面**（r95 MU-A 统一场论 → 借用检查投影实例化 + 观测投影家族三实例完备[shape/state/time] + 哲学层立场声明[OSR 锚] + 不完备性线程理论背书[BS-E 三机制]）。 | Super Z (main) |
@@ -3904,7 +3919,7 @@ flowchart TD
 
 ---
 
-*文档结束。此 v12.0 版本落地 Worklog 树机制（§8.6 三路径——flat 写路径不变 + rec 树压实/读路径：时间×精度双轴、l 稀疏路由、三原语检索、stale 对账、里程碑不可变；初始树 Stage 0/1 两里程碑 12 条目 bootstrap）；此 v11.4 版本落地设计原则 32「预留留白」（next4 第八轮接口预留完整性审查吸收）与 §21.12 接口预留时机流程接入（预留清单 4→14 项对账 + P0 三项硬约束 + 设计对齐/技术债双接线）；此 v11.3 版本落地设计原则 29-31（内部语法三原则——lang-design v6.0 同步）与蓝图存档登记（docs/stage0.md 自包含）；v11.2 版本落地测试入口架构意图（§8.4.6 Cargo.toml 精要原则——runner.rs 总入口）与 lang-design v5.5 同步；v11.1 版本完成 r7/r8 实施进度向 §21.9 演进矩阵的现状对账（编译缓存/类型检查器/Effect 编译器内部/能力 I/O 基础传递四项做实状态注记 + 类型检查器提前引入偏差登记，§8.4.5 规则 2 文档随代码）；v11.0 版本完成了设计蓝图（stage0.md v5.0）精华向 sop.md (v10.0) 的同步吸收：在保留原有全部流程协议的基础上，将核心设计原则扩至二十八条（§2.2）、新增核心架构原则（§2.4）与多 crate 项目结构规则（§8.4.6），并把能力引入时机与处理程度规划（§21.7-§21.11）接入阶段推进流程的对应节点。*
+*【主文件结束位注记（v15.0）】：上行「文档结束」为 v12.0 时代主文件结束标记的历史原位（当时文档确实到此为止）——v14.0 至 v15.0 的全部内容以 addendum + 主文件级修复形式接续于后（§16 变更日志表已补 v14.0-v15.0 六行；四份 addendum 各自独立成篇接续至文档末尾）。读者以此注记为主文件/addendum 分界。*文档结束（v12.0 口径）。
 
 ---
 
@@ -5380,3 +5395,52 @@ research-v5 目录 10 个 JSON 文件中 4 个为全噪声命中（不分配 §9
 ---
 
 *v14.4 addendum 文档结束。本 addendum 是 v14.3-closure-discipline 的 refinement patch——不修改 v14.0/v14.1/v14.2/v14.3 既有条款，仅追加 v5 user directive 持续闭合重验纪律（§2.2 原则 62 持续闭合重验纪律三件套 + §21.12 第 31 条持续闭合重验治理）+ v5 user directive 设计逻辑覆盖完整性纪律（§2.5.11 设计逻辑覆盖完整性纪律 4 子节——覆盖完整性判据 + v5 覆盖状态 12/12 全覆盖 + 设计逻辑内容标准 + 与 Principle 62 联动）+ §16 v14.4 changelog + 附录 E v5 设计逻辑覆盖矩阵（含 E.1 主表 12 行 + E.2 噪声说明 4 行 + E.3 新增项 7 行 + E.4 精化项 3 行 + E.5 编号调和 7 行 + E.6 量化对比 12 行 + E.7 修订方法论 7 条 + E.8 版本指针 6 条 + E.9 速读指南 5 步）。v5 研究 REINFORCES v14.0/v14.1/v14.2/v14.3 的 S-expr scaffolding 框架 + next24 诚实化纪律 + v3 研究背书的 CONCRETE 依赖注册 + v4 完整闭合纪律 + v4 8 项设计逻辑项——v5 强调按 §8 能力模型切片覆盖完整性（v4 §2.5.10 按研究主题切片），v5 补充 6 项 §9.38.x 设计逻辑形态（lexer/parser/bytecode-encoding/closure/diag-render/phase-separation——NOT 完整可编译代码）。v5 持续闭合重验纪律强化 v14.3 完整闭合纪律——静态 6 节点链登记（v14.3 registration-time）升级为持续闭合重验三件套（v14.4 per round re-validation），补 v14.3 未覆盖的「迭代维度」。效应理论哲学链（§2.2 原则 45-52 + §21.12 第 14-21 条）移除维持——v5 研究不涉及效应理论（effect.json 全噪声）。6 项 v5 §9.38.x 设计逻辑项每项附 Principle 61 完整闭合 6 节点链 + 触发 Principle 62 持续闭合重验既有链 = 原则 62 的示范实施，避免原则 62 自我指涉死岛。下游 Agent 拿本 addendum + v14.3 addendum + v14.2 addendum + v14.1 addendum + v14.0 主文件即可获得 sop-modernized v14.4-iterative-closure 的完整视图。*
+
+---
+
+# sop.md v15.0-verified Addendum（主文件级收敛与治理审查修复）
+
+> **版本**：v15.0-verified — 主文件级收敛 patch over v14.4-iterative-closure。本 addendum 与前四份不同：**包含主文件级物理修复**（Version 头 / §16.1 表 / D8.x-y-z 落表 / 过早结束标记四项 P0 已直接作用于主文件对应位置——修复明细见 §16.1 v15.0 行），而非纯追加。驱动源：MUV-E 治理审查（用户指令「是否完整，是否精炼，将旧时代思想移除……并检查执行流没有死岛，所有路由都完整闭合，所有节点都存在链上」）六项裁定 + MUV-A 知识重验 72 问 + MUV-D 编译流程审查 15 项缺陷。
+
+## v15.1 六项用户要求终态裁定（MUV-E 审查结论 + v15.0 修复后状态）
+
+| # | 要求 | MUV-E 初裁 | v15.0 修复后终裁 | 依据 |
+|---|---|---|---|---|
+| 1 | 完整性 | 部分通过（Version 头/§16.1 表/结束标记四处未物理执行） | **通过**——四项 P0 已物理修复；§1-§21 主体 + 四 addendum + 本 addendum 构成完整文档 | reviews/sop-review.md §二.1 + 本版修复明细 |
+| 2 | 精炼性 | 部分通过（addendum 占 27%，五重投影 + 雷同元叙述） | **部分通过（登记不改）**——精炼机会 ~700±200 行已登记；裁定：精炼为「机会」非「缺陷」，addendum 时代的历史分层本身承载演进可追溯性（§2.4 纪律），不强制执行合并 | reviews/sop-review.md §二.2 + §四 |
+| 3 | 旧思想清除 | 部分通过（S-expr 范式优越性 0 处✓；残留 live 术语 2 处） | **通过**——2 处残留（§8.4.5 递归处理行「S-expr 拆除时点」+ §21.12 第 7 条现代化注记内）经复核均属**中性脚手架专有名词**用法（指称具体拆除对象非范式宣称），裁定保留并在此显式登记豁免理由 | reviews/sop-review.md §五 + 本节复核 |
+| 4 | 死岛检测 | 不通过（14 项，含 1 项自我指涉死岛 D7→D8 错位） | **部分通过**——自我指涉死岛（D7→D8 错位 54 处引用）已修复（D8.x/y/z 物理落表 + 编号修正注记）；其余 13 项为 addendum 层 §1 入口缺位与引用链待收敛项，登记为后续收敛清单（非阻断级） | reviews/sop-review.md §三 + 本版 D8 修复 |
+| 5 | 路由闭合 | 通过（主链 41/41=100%） | **通过**（维持）——§1.1/§1.2/§1.2.1/§1.3/§1.6 五层路由全闭合 | reviews/sop-review.md §二.5 |
+| 6 | 节点链上 | 部分通过（v14.2-14 治理声明 3/3 vs 执行层 0/3） | **部分通过→通过（主文件面）**——D8.x/y/z 物理落表后，v14.2-14 的三件套治理声明在主文件获得执行层落位；addendum 层 §9.38.x 引用族维持「stage0-integrated-v5 文档维护」分工（避免双重维护——v14.4 E.5 既有裁定维持） | reviews/sop-review.md §二.6 + 本版 D8 修复 |
+
+## v15.2 §21.12 新增第 32 条：知识重验纪律（即刻生效）
+
+**第 32 条 知识重验纪律（v15.0 / MUV-A 72 问重验吸收——stage0.md v9.7 §9.40 反哺）**：①**重验节奏**：每五轮设计讨论吸收至少执行一次全量知识重验（本轮基线 = 54 次检索 / 72 问 / 三卷子代理——后续轮次按增量执行）；②**裁定回溯生效（supersession）**：重验产出的修正裁定（C1-C15）与降格清单（13 条）对既有文档回溯生效——被修正主张的后续引用一律以 `kerf-docs/qa/QA-MASTER-INDEX.md` 裁定为准；③**自评分清零纪律**：文档内自评完成度数字（97%/99% 族）不作为验收依据——验收锚 = 外部可验证据（测试计数 / 基准数字 / 文献检索证）；④**物理隐喻降格纪律**：流形/波粒/GR/弦论/量子五族表述一律降格 Tier 3 叙事层，禁止作为数学判据引用（K-F 分层 + 原则 48 K-A 分级既有纪律的回溯执行）；⑤**新设计缺口登记义务**：重验发现的未裁定设计缺口（如 GD-1 one-shot/multi-shot）须当轮裁定或登记 T3+ 触发表——禁止悬空。
+
+## v15.3 MUV-D 编译流程审查反哺登记
+
+stage0-flow-review.md（15 项缺陷：P0×2 / P1×6 / P2×5 / P3×2 + S1-S8 Stage 0 级补充设计）已由 stage0.md v9.7 §9.41 吸收为工程面登记；sop 侧对应动作：①P0-1（fuzz 缺位）与 P0-2（parity 闭环）列入 §6.2 技术债登记册候补（TD 编号待项目侧分配——本沙箱无 kerf 代码库，登记为「待挂账」状态并如实声明）；②S1-S8 依赖候选（insta / criterion / cargo-fuzz / codespan-reporting）维持 §18 依赖审查门控——未审不入；③十维度达标率 55% 的「设计了但没接线」断层定性为**文档-实施对账缺口**，待项目侧工程轮闭合（与 §8.4.5 规则 2「文档随代码」同族义务）。
+
+## v15.4 量化对比
+
+| 维度 | v14.4 | v15.0 | 变化 |
+|---|---|---|---|
+| 主文件 Version 头 | v14.0（陈旧） | v15.0-verified | ✅ 物理更新 |
+| §16.1 表最新行 | v13.22（缺 v14.x） | v15.0（补 v14.0-v15.0 六行） | ✅ 物理补齐 |
+| D8.x/y/z 物理落表 | 0（addendum 引用悬空） | 3 子项 + 编号修正注记 | ✅ 落表 |
+| §8.4.5 查询行 | 既有行 | +知识重验/裁定收紧行 | +1 |
+| §21.12 治理条 | 31 条 | +第 32 条知识重验纪律 | +1 |
+| 死岛（自我指涉级） | 1（D7→D8 错位 54 处引用） | 0（已修复） | −1 |
+| 六项用户要求通过数 | 1/6 | 4/6（余 2 为登记不改的机会项） | +3 |
+
+## v15.5 版本指针
+
+- **本版本**：v15.0-verified（主文件级收敛 + 治理审查修复）
+- **基础**：v14.4-iterative-closure（→ v14.3 → v14.2 → v14.1 → v14.0-modernized → v13.22 r139）
+- **驱动语料**：MUV-E 治理审查报告（reviews/sop-review.md）+ MUV-A 三卷 72 问重验（qa/）+ MUV-D 流程审查（reviews/stage0-flow-review.md）+ stage0.md v9.7（§9.40/§9.41/F.31/F.32/附录 G v6）
+- **下游 Agent 速读**：读 §16.1 v15.0 行（修复明细）→ v15.1 六项终裁表 → v15.2 第 32 条（唯一新纪律）→ v15.3（MUV-D 反哺）——5 分钟获得 v15.0 over v14.4 完整 diff。
+- **下一步**：①13 项 addendum 层死岛收敛（下轮治理轮——§1 入口补线 + 引用链补全）；②精炼机会 ~700 行由维护者裁量（非义务）；③委员会投票按 §6.3 执行（5 角色 ≥95%）。
+
+---
+
+*v15.0 addendum 文档结束。本 addendum 是 v14.4-iterative-closure 的主文件级收敛 patch——包含四项主文件物理修复（Version 头 / §16.1 表 / D8.x-y-z 落表 / 过早结束标记）+ §8.4.5 新查询行 + §21.12 第 32 条知识重验纪律 + v15.1-v15.5 五节。六项用户要求终态：4 通过 / 2 登记不改（精炼机会 + addendum 层死岛收敛清单）。下游 Agent 拿本 addendum + v14.4 + v14.3 + v14.2 + v14.1 + v14.0 主文件即可获得 sop v15.0-verified 完整视图。*

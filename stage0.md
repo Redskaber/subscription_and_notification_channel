@@ -3509,7 +3509,7 @@ C[errno 全局变量 + -1/NULL 返回值 + 手动检查]/C++/Java/Python[throw/t
 
 **三项裁定**（判据先于先例——原则 35）：
 
-- **裁定 G-A（登记记法）**：kerf 语法文件采用 **W3C EBNF 风格**（`::=`/`|`/嵌套产生式/`(* *)` 注释）。判据：①登记可读性（30 年规范工业实证——无需工具即可人审）；②记法无歧义史（ISO 14977 的 `[], {}` 记法歧义与 Wheeler 批评注记——E.16-108/109）；③与实现形式完全解耦（纯文档形式不绑定任何生成器——见裁定 G-C）。
+- **裁定 G-A（登记记法）**：kerf 语法文件采用 **W3C EBNF 风格**（`::=`/`|`/嵌套产生式/`(* *)` 注释）。判据：①登记可读性（30 年规范工业实证——无需工具即可人审）；②记法无歧义史（ISO 14977 的 `[], {}` 记法歧义与 Wheeler 批评注记——E.16-108/109）；③与实现形式完全解耦（纯文档形式不绑定任何生成器——见裁定 G-C）。**记法来源精确化注记（v9.8——§9.42 审计修正 B5）**：XML 1.0 §6 原版符号集实为 `::=`/`( )`/`?`/`|`/`A-B`/`+`/`*`/字符类——无 `{ }` 重复、无 `(* *)` 注释、`[ ]` 为字符类非可选；kerf 实际记法 = **XML/BNF 产生式骨架（`::=` 与 `|`）+ ISO 14977 重复/可选/注释记号（`{ }`/`[ ]` 可选/`(* *)`）的混合形态**——「W3C EBNF」为惯例简称，精确来源以本注记为准（记法本身无歧义、自洽可用——命名失真不影响三判据成立；E.31-167 检索锚）。**记法来源精确化注记（v9.8——§9.42 审计修正 B5）**：XML 1.0 §6 原版符号集实为 `::=`/`( )`/`?`/`|`/`A-B`/`+`/`*`/字符类——无 `{ }` 重复、无 `(* *)` 注释、`[ ]` 为字符类非可选；kerf 实际记法 = **XML/BNF 产生式骨架（`::=` 与 `|`）+ ISO 14977 重复/可选/注释记号（`{ }`/`[ ]` 可选/`(* *)`）的混合形态**——「W3C EBNF」为惯例简称，精确来源以本注记为准（记法本身无歧义、自洽可用——命名失真不影响三判据成立；E.31-167 检索锚）。
 - **裁定 G-B（定义/解析分离）**：**语言定义在 CFG 语义层面（EBNF 产生式），语言解析在实现层面（Stage 0 手写递归下降——§7.3 Reader 300 行工程捷径裁定维持不变）**。PEG 登记为 Stage 2+ 实现参考锚（有序选择的解析确定性优势），但**不作为语言规范记法**——理由：PEG 的无歧义性是「解析性质」而非「定义性质」，有序选择使文法自身参与语义裁定（`a / b` 与 `b / a` 接受不同语言），规范层应保持组合子的代数中立（与原则 10「判定先于文法」同构——判据在产生式之外）。
 - **裁定 G-C（生成器不入自举链）**：语法生成器（ANTLR 类）**永不进入自举链**——与 LLVM 策略同构同款（Stage 2+ 可选外围工具，不进 kerf 编译 kerf 的链路）。Stage 0 手写 Reader 的正确性由九糖推导表 + 1005 测试锚守护（[02-语法模型 §7](lang-design/02-syntax-model.md) 测试锚点），不依赖生成器的文法正确性传递。
 
@@ -4323,10 +4323,20 @@ base_ty        ::= 'i8' | 'i16' | 'i32' | 'i64' | 'u8' | 'u16' | 'u32'
 (*  内核：8 原语不变（第九轮验证）  签名：效应容器模型终态          *)
 (* ══════════════════════════════════════════════════════════════ *)
 
-(* ---------- 词法层（全层共用——Rust 最小集补全） ---------- *)
+(* ---------- 词法层（全层共用——Rust 最小集补全 + v9.8 审计补全 B6/B7） ---------- *)
 
 program          ::= compilation_unit ;
 compilation_unit ::= { module_decl | item } EOF ;
+
+(* —— 字符类与辅助终结符（v9.8 补全——主流规范显式定义惯例：Rust Reference
+   DEC_DIGIT→[0-9] 全显式 / JLS §3.8 显式委托 Character.isJavaIdentifierStart——
+   无沉默留白先例，E.31-172 检索锚） —— *)
+letter           ::= "a"-"z" | "A"-"Z" ;      (* ASCII 基础域；Unicode 标识符 = XID_Start/XID_Continue 委托声明（Stage 2+ lexer 义务） *)
+digit            ::= "0"-"9" ;
+hex_digit        ::= digit | "a"-"f" | "A"-"F" ;
+oct_digit        ::= "0"-"7" ;
+bin_digit        ::= "0" | "1" ;
+newline          ::= "\n" | "\r\n" | "\r" ;   (* 行界——line_comment 终结锚 *)
 
 identifier       ::= id_start { id_continue } ;
 id_start         ::= letter | "_" ;
@@ -4348,7 +4358,14 @@ string_literal   ::= '"' { string_char | escape } '"' ;
 char_literal     ::= "'" ( char_char | escape ) "'" ;
 boolean_literal  ::= "true" | "false" ;
 unit_literal     ::= "()" ;                    (* nil ≡ ()——C12 裁定 *)
-escape           ::= "\" ( "n" | "t" | "r" | "0" | "\" | '"' | "'" ) ;
+escape           ::= "\" ( "n" | "t" | "r" | "0" | "\" | '"' | "'"
+                   | unicode_escape ) ;       (* v9.8 补全 B6——unicode 转义入 escape 族 *)
+unicode_escape   ::= "u" "{" hex_digit { "_" | hex_digit } "}" ;
+                 (* 1..=6 位 hex——Rust 同型（E.31-171 检索锚）；raw string（r"…"/r#"…"#）
+                    = Stage 2+ 豁免登记——按字符串需求信号再评估，本轮显式豁免非沉默缺位 *)
+
+string_char      ::= char - '"' - "\\" ;        (* v9.8 补全 B6——裸换行可入（多行字符串 Rust 同型） *)
+char_char        ::= char - "'" - "\\" ;         (* v9.8 补全 B6——char 位单字符域 *)
 
 comment          ::= line_comment | block_comment ;
 line_comment     ::= "//" { char - newline } ;
@@ -4368,9 +4385,11 @@ use_tree        ::= identifier [ "as" identifier ] ;
 visibility      ::= "pub" ;
                   (* pub(scope) 粒度 = Stage 2+ 候选登记（9.26.5——K 经济判据窗内裁定） *)
 
-(* 函数——容器模型签名终态 *)
+(* 函数——容器模型签名终态；[where_clause] 挂接 = v9.8 审计修复 B3（原死产生式——
+   定义于文法尾部却无任何定稿域产消引用，唯一引用在 Level 2 trait_method；
+   「节点都在链上」纪律修复——Rust 同型挂接位 fn/struct/enum/trait） *)
 fn_decl         ::= [ visibility ] "fn" identifier [ "<" type_params ">" ]
-                    "(" [ params ] ")" "->" effect_union block ;
+                    "(" [ params ] ")" "->" effect_union [ where_clause ] block ;
 params          ::= param { "," param } ;
 param           ::= [ "mut" ] identifier ":" type ;
 type_params     ::= type_param { "," type_param } ;
@@ -4379,11 +4398,11 @@ type_bound      ::= type { "+" type } ;         (* 上界合取——Rust 同型
 
 (* 类型声明 *)
 type_decl       ::= [ visibility ] ( struct_decl | enum_decl | alias_decl ) ;
-struct_decl     ::= "struct" identifier [ "<" type_params ">" ]
-                    "{" { field_decl } "}" ;
+struct_decl     ::= "struct" identifier [ "<" type_params ">" ] [ where_clause ]
+                    "{" { field_decl } "}" ;                 (* where 挂接 = v9.8 B3 *)
 field_decl      ::= [ visibility ] identifier ":" type "," ;
-enum_decl       ::= "enum" identifier [ "<" type_params ">" ]
-                    "{" { variant_decl } "}" ;
+enum_decl       ::= "enum" identifier [ "<" type_params ">" ] [ where_clause ]
+                    "{" { variant_decl } "}" ;              (* where 挂接 = v9.8 B3 *)
 variant_decl    ::= identifier [ "(" type_list ")" ] "," ;
 alias_decl      ::= "type" identifier [ "<" type_params ">" ] "=" type ";" ;
 
@@ -4395,7 +4414,8 @@ effect_direction ::= "direction" ( "forward" | "reverse" | "bidirectional" ) ","
 
 (* 能力声明（Level 0 面 = 声明 + 门控；操作语法族见 Level 2） *)
 capability_decl ::= [ visibility ] "capability" identifier
-                    [ "<" type_params ">" ] "{" { cap_member } "}" ;
+                    [ "<" type_params ">" ] [ where_clause ]        (* where 挂接 = v9.8 B3 *)
+                    "{" { cap_member } "}" ;
 cap_member      ::= cap_operation | cap_state ;
 cap_operation   ::= "fn" identifier "(" [ params ] ")" "->" effect_union ";" ;
 cap_state       ::= "state" "{" { state_field } "}" ;
@@ -4417,6 +4437,10 @@ expr_stmt       ::= expr ";" ;
 (* 效应执行与处理（机制面核心） *)
 perform_stmt    ::= "perform" effect_ref "(" [ args ] ")" ";" ;
 handle_stmt     ::= "handle" expr "{" { handler_arm } "}" ;
+                 (* v9.8 审计注记 B2（§9.42）：if/match/perform/handle 当前仅语句位——
+                    表达式位形态（if_expr/match_expr/perform_expr/handle_expr）三方案
+                    裁定登记于 §9.42-B2（推荐①表达式位扩展 / ②宏补位 / ③语句化刻意裁定）
+                    ——切换窗开窗前必选其一，禁止沉默维持 *)
 handler_arm     ::= effect_pattern "=>" handler_body "," ;
 effect_pattern  ::= effect_name [ "(" [ pattern_list ] ")" ] [ "if" expr ] ;
 handler_body    ::= "resume" "(" expr ")"       (* 恢复续体——脱糖 (κ v) Apply *)
@@ -4702,7 +4726,7 @@ extern_item      ::= [ visibility ] "fn" identifier
 
 #### 9.26.6 二义性审理汇总（例 1-22 完备消歧策略表）
 
-> 既有十七例（§8.5-§8.11 链：v3 三例 + v4 四例 + v5 三例 + v6 两例 + v7 两例 + v8 三例）+ 定稿新增五例（18-22）= **二十二例完备登记**。每例 = 同形源 + 消歧策略 + 验证形态。
+> 既有十七例（§8.5-§8.11 链：v3 三例 + v4 四例 + v5 三例 + v6 两例 + v7 两例 + v8 三例）+ 定稿新增五例（18-22）= 二十二例登记（r104 时点完备）。**后续增量**：例 23-25 续于 §9.27 INFO-C（r111）+ 例 26-27 由 §9.42 EBNF 审计轮追加（v9.8——B1/B4 缺口闭合）= **累计二十七例完备登记**（完备性口径随吸收轮递进——B17 口径漂移顺修：本表为二义性总登记位，跨节增量须回注本表）。每例 = 同形源 + 消歧策略 + 验证形态。
 
 | 例 | 同形源 | 消歧策略 | 登记轮 |
 |---|---|---|---|
@@ -4728,8 +4752,10 @@ extern_item      ::= [ visibility ] "fn" identifier
 | **20** | `::` 泛型实例化 vs 路径分隔（`f::<T>(x)`） | **路径级消歧**：generic_args 仅挂 path_expr 尾（`qualified_name "::" generic_args`）——与 `::` 路径段同形由 `<` 开型消歧（`::<` 双字符序） | **r104 v9** |
 | **21** | 结构字面量 vs 块（`Type { ... }` vs `{ ... }`） | **首 token 消歧**：primary_expr 位 `qualified_name "{"` = 结构字面量；block 位 `{` = 块——两产消不共享位置（struct_lit 恒前缀路径名） | **r104 v9** |
 | **22** | 一元 `-` 与字面量（`-3` vs `x - 3`） | **词法先行显式**：负数字面量不并入 literal 产消——`-` 恒为 unary_op（与 Stage 0 D14 词法裁定同构——负数字面量词法层不折叠） | **r104 v9** |
+| **26** | 条件位/scrutinee 位 struct 字面量 vs 块边界（`if x { … }`——expr 尾 path_expr 后的 `{` 双解释：struct_lit 延续 vs block 开头） | **scrutinee 位排除**（例 21 消歧声明的边界补全——「两产消不共享位置」在 if/match/while scrutinee 边界不成立）：条件位/scrutinee 位裸 struct 字面量非法需括号——Rust Reference 文法级同款排除先例（`Conditions → Expression except StructExpression` / `Scrutinee → Expression except StructExpression`，E.31-169 检索锚）；lexer/parser 一致可判（scrutinee 解析完成前的 `{` 恒属外层构造） | **r119 v9.8** |
+| **27** | `'a` 类型变量 vs `'a'` char 字面量（type_variable 与 char_literal 同以 `'` 开头——例 16 仅登记脱糖映射非 lexer 消歧） | **二字符前瞻**：`'` 后第二字符为 `'` → char 字面量；否则 id_start → 类型变量——rustc_lexer `lifetime_or_char()` 同型前瞻（Reference `LIFETIME_TOKEN → … ! '` 规范注记同构，E.31-170 检索锚）；词法级单点判定零回溯 | **r119 v9.8** |
 
-**消歧策略三族归纳**：位置区分（例 1/3/7/17/18/21）+ 字符形态区分（例 6/7/9/20）+ 产消分立（例 2/4/5/8/10/12/13/14）+ 词法层裁定（例 22 + Stage 0 D14 同构）——四策略覆盖二十二例零隐式歧义（编译期可判性维持——D18 全清口径的目标语言面推广）。
+**消歧策略归纳**：位置区分（例 1/3/7/17/18/21）+ 字符形态区分（例 6/7/9/20）+ 产消分立（例 2/4/5/8/10/12/13/14）+ 词法层裁定（例 22 + Stage 0 D14 同构）+ **文法级排除**（例 26——scrutinee 位排除条款）+ **前瞻判定**（例 27——二字符前瞻）——六策略覆盖二十七例零隐式歧义（编译期可判性维持——D18 全清口径的目标语言面推广；v9.8 审计闭环）。
 
 #### 9.26.7 宏层脱糖路径表（关键字经济——张力族替代通道）
 
@@ -8355,6 +8381,23 @@ Landin 借用这个概念：**函数加上其捕获的环境，形成了一个"�
 - **165. OCaml 5 效应处理器堆栈策略（ocaml.org Effect handlers 手册章 + lobste.rs「Algebraic Effects: Another mistake carried through to」2025-05 讨论 + kcsrk.info「Practical Algebraic Effect Handlers in Multicore OCaml」[Sivaramakrishnan 等] + Hillerström「Effect Handlers via Generalised Continuations」[cited by 46]）**——效应处理器的栈策略工业实现：OCaml 5 效应处理器将效应调用的续延存储于堆并可在稍后调用（heap-allocated, dynamically resized stacks + one-shot delimited continuations——「简化资源推理：socket/锁」；q2 检索证：四源谱系含手册章+社区讨论+技术博客+学术论文）。**与本项目的对齐**：语料方案 4「perform 不创建栈帧 / resume 恢复的是效应流非调用栈 / 效应流状态存储在堆上」三断言 = **效应处理器实现策略面非效应语义必然**的裁定依据（OCaml 5 = 堆分配栈/续延的工业先例；kerf VM = 帧栈承载递归 + Perform/Handle 语义栈安全已达成——实现策略差异非语义差异）；与既有锚 E.29-161（Koka Perceus）构成效应型栈/内存策略双先例。
 - **166. 事件流解析与增量解析先例（matklad.github.io「Modern Parser Generator」2018-06 [rust-analyzer 架构交档] + Tree-sitter 增量解析综述 [deusinmachina.net 2024-04「Revolutionizing Parsing with an Incremental」] + softwareengineering.stackexchange「streaming parse to a tree (constant memory)」讨论 + Incremental Packrat Parsing [Dubroy 2017， cited by 21]）**——解析器的事件流形态：「不直接构建解析树，而是发射事件流（start internal node / finish node / token）」——rust-analyzer 实际架构（消费侧按需构建）；增量解析 = IDE 场景编辑后局部重解析（Tree-sitter——q3 检索证：四源谱系）。**与本项目的对齐**：语料方案 2（流式渐进解析——内存 O(深度) 而非 O(树)）的架构形态锚——**登记态备选的先例归位**（当前无深嵌套语料消费信号不开窗[原则 53 零信号纪律沿袭]；未来若需 = rust-analyzer 事件流形态参照 + Reader 256 帽内 O(tree) 内存现状对照）。
 - **167. 自举脚手架拆除与单运行时系统先例（tmewett.com「Bootstrapping and self-hosting」2020 + Chevalier-Boisvert 等「Bootstrapping a self-hosted research virtual machine」[dl.acm.org， cited by 18] + langdev.stackexchange「What are the benefits to self-hosting compilers?」2023 + Robert Heaton「What is a self-hosting compiler?」2017）**——自举的脚手架形态与拆除谱系：自举 = 先写或获得引导编译器再自替换；自寄宿 VM 案例实证「单一运行时系统（内存管理/I/O 等）消除双系统维护成本」；引导编译器与自寄宿编译器保持同步的双实现成本对照（q4 检索证：四源谱系含 trusting trust 讨论链）。**与本项目的对齐**：S-expr 语法脚手架拆除（切换窗步⑤ E5 收口——.krf 原件删除 + 种子链保留）的工程参照——「引导件保留为验证 oracle + 生产链单源化」= kerf 对「双实现成本 vs 验证安全」的平衡形态（平行件策略——比语料「完全移除」更强验证纪律）；与既有锚 E.25（Java/Chez/trusting trust 家族）构成自举拆除双锚。
+
+
+### E.31 EBNF 双语法审计检索证（v9.8 增补——第三十八轮引证）
+
+| # | 主题 | 检索验证结论 | 锚 |
+|---|---|---|---|
+| 167 | XML 1.0 §6 记法符号集 | 原版无 `{ }` 重复/`(* *)` 注释，`[ ]` 为字符类——「W3C EBNF」命名失实（实为 XML+ISO 14977 混合记法） | w3.org/TR/xml/#sec-notation |
+| 168 | ISO EBNF 14977 记号族 | `{ }` 重复/`[ ]` 可选/`(* *)` 注释为 14977 记号——kerf 记法来源确认 | en.wikipedia.org/wiki/Extended_Backus–Naur_form |
+| 169 | 条件位 struct-lit 排除 | Rust Reference 文法级排除：`Conditions → Expression except StructExpression` / `Scrutinee → Expression except StructExpression`（pre-1.0 LL(1) 二义历史） | doc.rust-lang.org/reference/grammar.html |
+| 170 | lifetime vs char 前瞻 | rustc_lexer `lifetime_or_char()` 二字符前瞻 + Reference `LIFETIME_TOKEN → … ! '` 规范注记 | github.com/rust-lang/rust（rustc_lexer/src/lib.rs） |
+| 171 | raw string / unicode escape 词法地位 | Rust 词法一等产生式（`r#"…"#` 井号 1..=255；`\u{...}` 1..=6 hex）——「词法完备最小集」宣称下须包含或显式豁免 | doc.rust-lang.org/reference/tokens.html |
+| 172 | 规范未定义终结符惯例 | Rust 全显式（DEC_DIGIT→[0-9]）/ JLS §3.8 显式委托 Character.isJavaIdentifier* / Swift 显式定义——无沉默留白先例 | doc.rust-lang.org/reference/tokens.html；cr.openjdk.org |
+| 173 | Koka perform/handle 形态 | Koka v3 无 perform 关键字（效应操作即直接调用）+ `with` 为表达式；OCaml 5 `perform e` 为表达式——效应执行/处理活在表达式位 | koka-lang.github.io/koka/doc/book.html；ocaml.org/releases/5.0/manual/effects.html |
+| 174 | Rust if/match 表达式位 | Reference「An expression always produces a value」+ TRPL「if/match/loops are also expressions」——语句化偏离先例须裁定 | doc.rust-lang.org/reference/expressions.html |
+| 175 | Rust 数字下划线实测 | `1_`/`1__`/`1__2` 全部编译通过（Reference `DEC_LITERAL → DEC_DIGIT ( DEC_DIGIT | _ )*` 无居间条款）——v9 记法与 Rust 精确一致（审计初判「尾下划线缺陷」被证伪撤回） | doc.rust-lang.org/reference/tokens.html；Rust Playground 实测 |
+
+检索方法：24 次 web_search（z-ai function）+ 6 次规范原文直读 + 3 次可执行实测（MUV-H2-SEARCH 子代理存证）。
 
 ## 附录 F：设计讨论演进记录
 
@@ -17643,3 +17686,301 @@ v5 增补相对 v4 增补的边际收益呈现**递减趋势**，本增补诚实
 - **完成度自评**：本 v5 增补按用户要求「ADD the v5 Q&A flows (G.27/G.28)」的范围，新增 2 段核心重组（G.27 + G.28）+ Part 1 增补子表 1.7（2 行）+ Part 4 状态迁移表（2 行）+ 维护协议注记 5 小节（D.1-D.5，新增 D.5 边际收益递减诚实声明）+ §4.11 第 8 项「设计逻辑深化轮（v4 未覆盖组件）与闭合重验轮的吸收纪律」；总覆盖从 86 段上升至 88 段，已重组从 26 段上升至 28 段。
 
 **收敛裁定**：本 v5 增补作为附录 G 的追加视图，与附录 G v1.0 主体 + v2 增补 + v3 增补 + v4 增补、§9.38 主线（待并行子代理补全）、§9.39 主线（待并行子代理补全）、§19 算法框架、§23.1 原则清单、F.4-F.31 对照表共同构成完整的问答流程档案体系。任何后续轮次新语料吸收（next39+）或主线修订，本增补应按 §4.11 第 8 项「设计逻辑深化轮（v4 未覆盖组件）与闭合重验轮的吸收纪律」同步更新。**诚实声明**：v5 增量边际收益递减 50%，后续 v6+ 轮次应**重新评估投入产出比**——若 v6 增量 < +1.0 应考虑停止追加附录 G 增补转而吸收为既有章节修订。
+
+---
+
+# 第四十轮：全量问答知识重验与裁定收紧（v9.7 新增）
+
+## §9.40 全量问答知识重验（next7-next24 十八文件 72 问——第三十九轮重验 / 第四十轮吸收）
+
+> **驱动源**：用户第三十九轮指令「整理 next*.md 中的所有提问请自己重新尝试知识搜索和结合现代前沿回答并对照后修正」——三个并行子代理（MUV-A1/A2/A3）深读 next7-next24 全部 18 文件（~21,000 行），抽取全部 72 个 question 块，执行 54 次 web_search 知识重验，逐问产出「原始提问 → 原回答核心[伪代码/理论叙述层标注] → 现代前沿重验（检索事实+URL）→ 修正裁定（维持原判/修正为X/降格为叙事层）」三段式。**行权形态**：#15 讨论主线第二十三次用户行权（知识重验吸收轮——纯文档域零代码变更；M1 指令开窗第二十六例——沿 r119/r121/r123 先例形态）。**核心裁定**：本轮为**裁定收紧轮（verdict-tightening round）**——不推翻任何机制层设计，仅对原创性宣称、物理隐喻数学化、自评分数字三类内容执行回溯性修正/降格；机制层（Perform/Handle/Resume 生命周期、resume ∈ {0,1} 可选性、效应统一异常/async、行类型语法、17 极简关键字、容器式 `Return(T) | E`）经 54 次检索重验**与 Koka / OCaml 5 / Plotkin–Pretnar 标准语义精确一致**——维持原判全部保留。
+
+### 9.40.1 重验总量与方法
+
+| 卷 | 覆盖文件 | 问题数 | 检索次数 | 维持 | 修正 | 降格 |
+|---|---|---|---|---|---|---|
+| 卷一（qa-cluster-1） | next7-next12 | 35 | 20（14 有效） | 25 | 5 | 5 |
+| 卷二（qa-cluster-2） | next13-next18 | 21 | 16 | 14 | 5 | 2 |
+| 卷三（qa-cluster-3） | next19-next24 | 16 | 18 | 5（含 2 局部降格） | 5 | 6 |
+| **合计** | **18 文件** | **72** | **54** | **44** | **15** | **13** |
+
+方法：逐问三段式（原始提问 verbatim → 原回答核心摘要 → 检索对照 → 修正裁定）；检索锚包含 Plotkin–Pretnar、Leijen Koka（MSR-TR-2013-79 / Perceus）、OCaml 5 effects（Eio）、Xie & Leijen 2021、rustc-dev-guide、Polonius、Kam & Ullman 1977、Siek & Taha 2006、Simonet HM(X) 2004、Zig comptime、Salsa、Guix live-bootstrap、QWIRE/Quipper。**全部回复内容标注 [伪代码/理论叙述层]——与附录 G Tier 2/Tier 3 伪代码标注纪律同源。**
+
+### 9.40.2 修正裁定十五条（C1-C15 全表）
+
+| # | 问题 | 原主张 | 修正后 | 检索锚 |
+|---|---|---|---|---|
+| C1 | next7:1 | 循环识别可在原语组合层完成 | 循环识别应发生在 CFG 层（LICM 标准位置） | superinstruction/peephole 对照 |
+| C2 | next8:2 | 根空间组织构成完备格 | 完备格 → 约束偏序/半格（unify 的数学结构） | 类型类格语义 |
+| C3 | next12:7 | Return-as-effect 为原创 | 有先例：Plotkin–Pretnar return 子句 | MSR/INRIA 文献 |
+| C4 | next12:9 | 逆向效应不可替代需独立原语 | 逆向等待可归约为正向（Eio/Koka 挂起表达） | OCaml 5 Eio |
+| C5 | next12:13 | 计算干涉为原创理论 | = 并发交换性/确定性并行理论再发现 | 线性化文献 |
+| C6 | next13:2 | 贝尔不等式/纠缠「超越经典关联」 | 物理+分布式双误——降格诊断性叙事 | QWIRE/Quipper |
+| C7 | next14:3 | GR 方程作内禀关系数学 | GR 降格叙事层；四层协同谱系保留 | 离散微分几何 |
+| C8 | next15:1 | 生命周期效应化零新增类型机制 | 仍需编译期线性检查；方向有 Perceus 先例 | Koka Perceus |
+| C9 | next15:4 | 并发正确性由流形数学自动给出 | 改依 happens-before 标准路径 | 并发理论 |
+| C10 | next16:2 | 类型观测锚量子观测 | 改锚渐进类型框架（Siek & Taha 2006） | gradual typing |
+| C11 | next19:1 | 弦论对应表+超越量子比特 | 对应表降类比；qudit 已存在，「超越」被反驳 | qudit 检索 |
+| C12 | next20:1 | 统一流分析「超越 Rust」四宣称 | 核心洞察被 NLL/Polonius 意外验证；四宣称三项事实错误 | rustc NLL 实史 |
+| C13 | next20:5 | 哥德尔不完备「验证理论」 | 改锚 Rice/停机/Thompson 信任链 | 可计算性 |
+| C14 | next22:2 | E 四维结构为完备描述 | 以观测等价为正式锚点（维度=观测投影） | 观测等价 |
+| C15 | next23:1 | B+C 混合现代自举（macro_rules!+增量） | 被 next24 自我修正推翻——S-expr Reader+查询纯函数+全量编译为权威 | macro_rules! 限制+rustc 增量史 |
+
+**降格十三条归类**：量化性能预测 / 概率域四维形式化 / 效应流形数学本体 / 量子同构族 / 「改变 PL 范式」 / 流形公理全可用 / 科学史类比 / 自评分数字族（清零建议） / 哲学同构宣称族 / 原创计数自增 / 九支柱 / 叙事包装族 / Layer 2-3 观测哲学（详见 qa/QA-MASTER-INDEX.md 第三节）。
+
+### 9.40.3 五大横向发现
+
+1. **物理隐喻当数学事实 = 全语料最大风险源**——流形/波粒/GR/弦论/量子五族全部降格；机制层全部维持。理论叙事层（K-F 分层）与机制层（8 原语冻结域）的分离纪律**经本轮重验再次确认有效**。
+2. **next23 → next24:1 → next24:2 构成唯一真实收敛链**——升格为 Stage 0-1 自举策略权威结论（与 §9.33 MSB-Z「现代化 = 用最适合当前阶段的技术」同锚强化）。
+3. **两个实质设计缺口登记**（见 9.40.4）。
+4. **五份「终极收敛审查」呈同构叙事通胀**——自评分与原创计数逐轮膨胀均未校准；裁定：全量清零自评分，以外部可验锚（测试/基准/文献检索证）替代。
+5. **最经检验洞察**：「借用检查=流分析投影」（NLL/Polonius 实史意外验证——保留为设计支柱）；「17 极简关键字+容器式 Return(T)|E」（行多态先例一致——保留）。
+
+### 9.40.4 设计缺口登记（GD-1 / GD-2）
+
+- **GD-1（P1 级）：one-shot vs multi-shot resume 未裁定**。OCaml 5 = one-shot（生产实践锚）；Koka 学术实现支持 multi-shot；Xie & Leijen 2021 给出实现对比。**补充裁定（本轮即刻生效）**：kerf Stage 0-1 采 **one-shot**（resume ∈ {0,1} 既有裁定与 OCaml 5 生产形态一致——§9.17「resume ∈ {0,1}」由本裁定获得外部先例锚强化）；multi-shot 列 Stage 3+ 登记态（零信号不开窗）。
+- **GD-2（P1 级）：生命周期参数 `'a` 宣称可全消不成立**。§9.29 重写面 vs 标注面分治裁定维持，但「默认推导优先」的边界被收紧：**显式 lifetime_annotation 逃生舱为永久保留项**（与 Rust NLL 后仍保留显式标注的先例一致——推导覆盖率的诚实上限）。
+
+### 9.40.5 一致性验证与 8 原语不变性第十六轮验证
+
+**8 原语不变性（第十六轮）**：本轮零触及原语/关键字/EBNF/通道——裁定收紧轮为纯文档域回溯修正，与第十三/十四/十五轮（r119/r121/r123）零语法增量轮同族。**一致性六项**：①与 §9.33 MSB-Z 本质洞察同锚（next24 收敛链再验证）；②与 K-F 理论-实现分层纪律同构（物理隐喻降格 = K-F 分层纪律的回溯执行）；③与 §9.26 EBNF v9 定稿零冲突（零语法面内容）；④与原则 58 计数零冲突（本轮不增原则——裁定收紧不产生新原则，仅收紧既有宣称口径）；⑤与附录 G 伪代码标注纪律同源（72 问全量标注）；⑥与 sop v14.4 原则 62 持续闭合重验兼容（本轮为该纪律的实例执行——新内容[本节]注册 6 节点链并重验既有链零断裂）。
+
+### 9.40.6 与既有线程关系
+
+知识重验线程（r123 §9.34 十检索 → r125 §9.36 v4 十主题 → r127 §9.38 v5 十主题 → 本轮 54 检索全量 72 问）的**总量收束轮**——历次检索总计 84 次，本轮占 64%。观测维度论线程（r119）与描述论线程（r115）的裁定收紧执行轮（C11/C13/C14 直接作用于该两线程的宣称层）。自评档案线程（K-H 口径族）的**清零裁定轮**——自评分数字族全量降格，后续档案仅登记外部可验锚。
+
+### 9.40.7 v9.7 收敛终态
+
+**双侧同步注记**：本节收编 lang-design 拆分面两件——18 v7.26→v7.27 §5zc（第四十轮术语八条：知识重验/裁定收紧/one-shot 裁定/逃生舱永久保留/叙事通胀/外部可验锚/收敛链权威化/降格纪律）+ 00 v6.27→v6.28（修订注记）；其余二十三件零增量维持（25 − 2）。sop v15.0 反哺（链 D）：§8.4.5 查询行增「知识重验/裁定收紧」；§21.12 第 32 条候选「知识重验纪律」（每五轮设计讨论吸收至少执行一次全量重验——待委员会）。**收敛裁定**：72 问全量三段式重整完成（qa/ 三卷 + QA-MASTER-INDEX 总集）；修正 15 / 降格 13 / 维持 44；GD-1/GD-2 两缺口即刻裁定；8 原语第十六轮零触及。**R5 顺修（本轮回溯性文档修正登记）**：①附录 G v5 增补尾部「§9.38 主线（待并行子代理补全）/§9.39 主线（待并行子代理补全）/F.31 吸收表（待补）」三处 stale 标记——实际 §9.38（行 15347）/§9.39（行 16670）均已存在，stale 标记过时，本轮宣告作废；②F.29 编号缺位说明——F.28（r33）与 F.30（r34）之间编号跳跃系第三十四轮两段吸收合并登记所致，F.29 编号永久让缺（不回填——避免行号漂移），F.31 起接续；③本节为 F.31/F.32 吸收表的正式回填载体（见下）。
+
+
+## §9.41 编译流程审查吸收与 Stage 0 级补充设计（第四十一轮——MUV-D 审查报告全量吸收）
+
+> **驱动源**：用户指令「审查 stage0.md 中是否存在编译器开发设计测试等流程是否存在缺陷或缺漏，是否通过现代前沿编译流程进行设计和实现……如果存在在 stage0 可以并应该确定的，则应该根据缺陷并通过知识搜索和前沿知识对其进行对应当前阶段程度的补充和完善」。审查子代理（MUV-D）分段审读 §7/§8/§10-§15/§19-§21/§9.30-§9.34/§9.36.8/§9.38.6/附录 G 十一区段 + 8 组关键词全文定向核查 + 14 次 web_search（rustc 查询系统/cargo-fuzz/insta/salsa/MLIR/criterion/computed goto/Csmith 差分/bootstrap trust 十二主题）。**核心裁定**：语义架构设计密度极高（三层能力矩阵、CC-Chain 治理为超配项），验证流程存在系统性「**设计了但没接线**」断层——加权达标率 ≈55%（达标 2 / 超配或部分 7 / 缺漏 1，十维度）。
+
+### 9.41.1 十维度对照矩阵结论
+
+| 维度 | 判定 | 要点 |
+|---|---|---|
+| 解析器架构 | ✅ 达标 | 迭代式 Reader + 256 帽 + Pratt 预登记（§9.38.3） |
+| IR 设计 | ◐ 部分 | CoreExpr 单源 + ANF-SSA 规划在位；MLIR 级 dialect 层级未设计（sop §2.5.1 触发式——维持登记态合理） |
+| 查询式与增量 | ◐ 部分 | 纯函数五查询设计（§9.33 ModernStage0Compiler）只登记未接线——见 D5 |
+| 测试体系 | ◐ 部分 | 1224 测试基线 + PBT 既有；快照无 insta 工程化（D3）/ fuzz 缺位（D2）/ 差分无执行方案（D4） |
+| CI 与自举验证 | ◐ 部分 | fixpoint 三路全等门设计完备；CI 节奏与 DDC 触发条件缺（D9） |
+| 诊断与错误恢复 | ◐ 部分 | 结构化诊断 + codespan 决定悬置（D7）/ error recovery 未接验收判据（D8） |
+| 后端与优化窗 | ✅ 达标 | VM 永久基座 + Stage 2+ 本地码后端不入自举链宪制清晰 |
+| 项目治理 | ◐ 超配/部分 | 人工密度超配（委员会/投票/深审族）但自动化护栏缺（D13） |
+| 性能回归护栏 | ❌ 缺漏 | 基准「有集无门」（D6） |
+| 文档-代码同步 | ◐ 部分 | SSOT 纪律在位；自动化护栏缺（D12） |
+
+### 9.41.2 缺陷清单吸收（15 项：P0×2 / P1×6 / P2×5 / P3×2）
+
+**P0**：D2 模糊测试缺位（Reader/VM 加载器信任边界裸奔——DEA-13 承诺 fuzz 层但闭合设计只落 PBT）；D9 自举 parity 闭环缺最后一环（无 CI 节奏、无 DDC 触发条件、豁免无审批流）。**P1**：D3 快照 insta/expect-test 工程化 / D4 跨版本差分测试执行方案 / D5 查询注册表最小设计 / D6 基准回归双门 / D10 测试正负比可执行口径 / D11 EBNF↔Reader 一致性自动验证。**P2**：D1 VM 派发谱系裁定 / D7 codespan 集成决定 / D8 error recovery 验收判据 / D12 文档同步护栏 / D13 治理自动化。**P3**：D14 tree-shaking 预留 / D15 交叉编译矩阵。（逐项定位章节+修法详见 reviews/stage0-flow-review.md）
+
+### 9.41.3 Stage 0 级补充设计（S1-S8 吸收登记）
+
+八项补充设计已由审查报告产出（每项含【问题】【Rust 风格伪代码——全部标注 `// [伪代码 — 仅作概念示意，非可编译实现]`】【验收判据】）：S1 快照三品类+审查工作流 / S2 fuzz 三 target（Reader 字节级+Expander 深度+VM 加载器）/ S3 跨版本差分门 / S4 最小查询注册表五查询 / S5 基准双门+criterion / S6 负路径金字塔+error corpus / S7 文法一致性哨兵 / S8 验证门分级表+豁免审批流。**吸收裁定**：S1-S8 全部登记为 **Stage 0 应确定事项**（设计级定稿，实施窗口 = 项目侧下轮工程轮）；零 EBNF 增量、不触碰 8 原语冻结域、新依赖候选（insta/criterion/cargo-fuzz/codespan-reporting）一律走 sop §18 依赖审查门。
+
+### 9.41.4 一致性验证
+
+①与 §9.34（r123 十检索现代实践对照）互补——r123 对照的是架构面（查询/MLIR/PBT），本轮对照的是**验证工程面**（fuzz/差分/快照/基准门），零重叠冲突；②与 sop v14.4 §2.5.4（PBT+golden+fuzz 触发式接入）对齐——本轮 S1/S2/S3 即该条款的 Stage 0 落地设计；③与 DEA-13（§9.35）审计体系衔接——D2/D9 即 DEA-13 两处断链的补全设计；④8 原语不变性第十七轮验证：零触及（纯验证工程面）。⑤与 CC-Chain/CC5-discipline（§9.37/§9.39）链纪律兼容——S1-S8 每项注册 6 节点链（trigger/consumer/test/deadline/owner/rollback——见审查报告第四章）。
+
+
+### 9.42 EBNF 双语法审计与修正吸收（v9.8——第三十八轮：第三十一/三十二轮审计线之后的文法面审计轮）
+
+> **本节定位**：用户第三十八轮指令（r119）「当前 stage0.md 中针对 stage0 的 EBNF 语法是否清晰并精要且不缺失；对 stage2+ 自举目标语言的 EBNF 是否同样精要优雅不缺失——两个 EBNF 都需要唯一可信源、确切位置和内容、每一个语法语义都需要充分的理由、禁得起推敲」的**全量审计吸收**。审计对象 = §9.16.3（Stage 0 表面语法——53 产消）+ §9.26 五位一体（Stage 2+ 目标语言 v9——词法 21 + Level 0 ~70 + Level 1-4 ~90 登记产消）；审计方法 = 载体全量定位（5 代码块 + 6 散文语料 + 九源 supersession 链）→ 逐产消精读 → 8 主题 24 检索现代前沿对照（E.31-167~175）→ P0-P3 分级裁定。交付物 = [reviews/ebnf-review.md](reviews/ebnf-review.md)（全量审计报告）。**收敛口径**：纯文档域零代码变更；§3.2 冻结不动；定稿域物理修正五处（注记级/挂接级/词法补全级——非产消语义变更）；B2 表达力三方案登记待切换窗裁定。
+
+#### 9.42.1 唯一可信源裁定（C1-C3）
+
+**C1（Stage 0 EBNF）**：唯一可信源 = **§9.16.3**（行 3516-3580——W3C EBNF 风格代码块 1 份，三层组织 53 产消）✅ 单源成立。权威层级三级：终极权威 = `kerf-syntax` symbol.rs + Reader 实现（R4 代码为准）；文档权威 = §9.16.3（全文档 grep 确认无第二文法呈现位）；对账声明在位（§9.16.5「grammar 骨架 25 关键字与 symbol.rs `Keyword::ALL` 逐名一致」）。**诚实边界**：本机无 kerf 代码仓库——代码级对账不可独立执行，本轮仅验证文档内自洽性（R4 口径的边界声明，非缺陷）。
+
+**C2（Stage 2+ EBNF）**：唯一可信源 = **§9.26 五位一体**（§9.26.2 词法+Level 0 定稿域 / §9.26.3 Level 1-4 登记域 / §9.26.4 优先级表 / §9.26.5 关键字分级 / §9.26.6 二义性表——五者共同构成完整文法定义，缺一不可）✅ 成立附条件。文档体系内声明「lang-design/02 §8.13 = 权威定稿位（本节为存档面全量）」= **双侧架构**（一权威 + 一镜像，非无序双源）；单源收敛原则在位（九源语料 v1-v8 + §9.16.4 全部被 v9 显式 supersede——§9.26.1 九源地图 + C1-C12 整合裁定档案可追溯）。**边界**：lang-design 拆分面不在本机 → 双侧同步一致性不可核验（漂移检测自动对账脚本 = Stage 2+ 工具窗义务——声明在位 §9.16.5）。
+
+**C3（载体形态地图）**：5 个 ```ebnf 代码块（§9.16.3 定源 / §9.16.4 档案 / §9.26.2 定稿 / §9.26.3 登记 / §9.29.3 第十源）+ 6 份散文内嵌语料（§9.18.5 v3 / §9.19.7 v4 / §9.20.7 v5 / §9.21.5 v6 / §9.22.4 v7 / §9.24.5 v8）+ 第九源散文登记（§9.27 INFO-C）——**双形态载体 + supersession 链结构清晰，无幽灵双源**（散文语料 = 演进档案非第二可信源）。
+
+#### 9.42.2 审计发现总表（B1-B23'——P1×2 / P2×5 / P3×10 / 撤回 1 / 通过 6）
+
+| 级 | 编号 | 发现 | 处置 |
+|---|---|---|---|
+| **P1** | B1 | 条件位/scrutinee 位 struct-lit 二义缺口（例 21「两产消不共享位置」在 `if expr block` 边界不成立——expr 尾 path_expr 后 `{` 双解释；Rust Reference 文法级排除先例 E.31-169） | ✅ **物理修复**：例 26 落位 §9.26.6 + 六策略归纳更新 |
+| **P1** | B2 | 表达力错位（8 原语内核 If/Perform/Handle 皆表达式，v9 表面全语句化——`let x = if…` / `g(perform E())` 不可表达；S-expr 面 `(+ 1 (perform E))` 无法直译 = 皮肤字典映射完备性被打破；Koka with/OCaml 5 perform/Rust if-match 三先例全表达式位 E.31-173/174） | ⚠️ **三方案登记（本节 9.42.4）**——切换窗开窗前必选其一（定稿域产消变更走 M1 开窗先例——用户指令 = 需求信号 r74） |
+| P2 | B3 | where_clause 死产生式（Level 0 定义却零定稿域引用——唯一引用在 Level 2 trait_method；「节点都在链上」违例） | ✅ **物理修复**：fn_decl/struct_decl/enum_decl/capability_decl 四处挂接 `[ where_clause ]`（Rust 同型挂接位） |
+| P2 | B4 | `'a` 类型变量 vs `'a'` char 消歧缺位（例 16 仅脱糖映射非 lexer 前瞻；rustc_lexer lifetime_or_char 二字符前瞻先例 E.31-170） | ✅ **物理修复**：例 27 落位 §9.26.6 |
+| P2 | B5 | 「W3C EBNF」命名失真（XML 1.0 §6 无 `{ }`/`(* *)`、`[ ]` 为字符类——实为 XML+ISO 14977 混合记法 E.31-167/168） | ✅ **物理修复**：§9.16.2 G-A 记法来源精确化注记（命名沿用惯例简称 + 精确来源声明） |
+| P2 | B6 | 词法完备宣称 vs 沉默缺位（raw string/unicode escape 为 Rust 词法一等产生式 E.31-171；string_char/char_char 未定义） | ✅ **物理修复**：string_char/char_char/unicode_escape 产消补全 + raw string 显式豁免登记（Stage 2+ 按信号评估） |
+| P2 | B7 | 未定义辅助终结符 ~22 个（主流规范显式定义或显式委托——无沉默留白先例 E.31-172） | ✅ **物理修复**：词法层 letter/digit/hex_digit/oct_digit/bin_digit/newline 六定义 + XID 委托声明 + ASCII 域注记；语义性终结符（condition/effect_kind 等 Level 2+ 语料内）= 登记态随文定义惯例注记 |
+| P3 | B8 | assign_stmt 仅裸 identifier（无 a.b=v / arr[i]=v 路径赋值位） | 登记裁定候选：字段更新替代路径（方法调用 set / 重建）——「lvalue 精简为裸标识符」设计理由须补注（Stage 2+ 候选） |
+| P3 | B9 | or_pattern 显式左递归 vs 全文 `{}` 记法不一致（V-H 已自登记 P3） | 顺修建议：`atom_pattern { "|" atom_pattern }`（原则 44 记法纪律——Reader 实现时左因子化等价） |
+| P3 | B10 | macro_invocation 与 postfix `!` 双通路重复（后者全覆盖前者实例空间） | 单源纪律小违例注记——可注记「stmt 显式形态=可读性」或删除 |
+| P3 | B11 | use_tree 单层嵌套（Rust 多层 `a::{b::{c,d}}`） | 简化未注记——补「刻意单层」裁定或候选登记 |
+| P3 | B12 | compilation_unit 无顶层裸 expr（9.16.4 骨架 expr_item 被 v9 整合删除未登记裁定；S-expr 面 toplevel 有 expr——script/REPL 形态双面不对称） | 登记裁定候选：顶层表达式通道（REPL/测试形态）或显式排除声明 + 皮肤字典排除注记 |
+| P3 | B13 | 类型参数定界双轨（type_decl `<...>` vs effect_decl/effect_container `(...)`）+ effect_decl 用 type_params vs effect_container 用 type_list——无理由注记 | 补注记候选：效应参数 = 值域标注语义刻意区分（若确认）——须登记非沉默 |
+| P3 | B14 | 签名返回三态（fn_decl→effect_union / effect_operation→type / cap_operation→effect_union） | 补注记候选：效应操作返回值类型由外层容器承载效应语义——须登记非沉默 |
+| P3 | B15 | borrow_decl 硬编码 Borrow 专属语法形态（内建名获专属文法 = 语法层保留字待遇，与「内建容器名非关键字」裁定张力） | 张力注记登记 |
+| P3 | B16 | 借用糖层级漂移（§9.26.2 unary_op 注释「Level 2」vs §9.29.3 第十源「Level 4 皮肤层候选」） | 层级归一注记：以 §9.26.2（定稿域在位）为准 = Level 2——第十源语料层级标注为语料时点口径 |
+| P3 | B17 | 二义性完备口径漂移（「二十二例完备」被例 23-25 打破且无回注） | ✅ **物理修复**：§9.26.6 表头口径更新（累计二十七例 + 跨节增量回注义务声明）；历史摘要位（能力矩阵等 r104 时点快照）保留不改写——完备性口径唯一权威位 = §9.26.6 表头 |
+| P3 | B22'（撤回） | ~~尾下划线词法缺陷~~（初判 `digit { "_" | digit }` 允许尾下划线违 Rust）——**T2 检索+实测证伪**：`1_`/`1__` 编译通过、Reference 无居间条款（E.31-175） | ✅ **撤回登记**（审计自纠错案例：疑虑错了也要修正——宁报错不静默的双向适用）；反向正名：v9 数字记法与 Rust 真实文法**精确一致** |
+| 通过 | B18-B20' | 优先级表 14 级单源一致 / 关键字经济 22 词面 + 脱糖路径全覆盖 / 内核映射 + 8 原语第九轮验证 | 正面确认（映射正确性无错——B2 是完备性问题非正确性问题） |
+| 通过 | B23' | 记法自洽性（or_pattern 外全产消记法一致 + terminator 分号制自洽） | 正面确认 |
+
+#### 9.42.3 修正落位清单（本轮物理修复七处 + 登记十项）
+
+**物理修复（7 处——注记级/挂接级/词法补全级，零产消语义变更）**：①§9.16.2 G-A 记法来源精确化注记（B5）；②§9.26.2 词法层六终结符定义 + XID 委托声明（B7）；③escape 扩展 unicode_escape + string_char/char_char 补全 + raw string 豁免注记（B6）；④fn_decl/struct_decl/enum_decl/capability_decl 四处 `[ where_clause ]` 挂接（B3——死产生式修复）；⑤perform/handle 区 B2 三方案指针注记；⑥§9.26.6 例 26/例 27 追加 + 表头口径 + 六策略归纳（B1/B4/B17）；⑦附录 F.31/F.32 编号冲突顺修（上轮双份改号 F.34/F.35——恢复附录编号唯一性）。
+
+**登记态裁定（10 项 P3——B8-B16）**：上表处置列全量登记，无一沉默；全部为 Stage 2+ 切换窗/后续吸收轮的审理素材，不构成本轮变更义务。
+
+#### 9.42.4 B2 表达力三方案裁定登记（P1——切换窗开窗前必选其一）
+
+**事实链**：内核映射表（§9.26.8）自证 If/Perform/Handle 在 CoreExpr 皆为表达式；v9 定稿域 `if_stmt/match_stmt/perform_stmt/handle_stmt` 仅语句位——expr 层级（range→…→primary）无对应表达式产消。后果三则：①`let x = if c { a } else { b };` 不可表达；②`g(perform E(v))` 嵌套效应不可表达（须 let 中转——**改变求值时序锚点，非皮肤映射而是语义改写**）；③S-expr 面 `(+ 1 (perform E))` 合法而目标面不可直译——皮肤字典（§9.26.9）映射完备性声明被打破，切换窗 parity 验证（SyntaxTransitionValidator 字节码全等——§9.25.4）在含嵌套效应表达式的 S-expr 语料上**无法产出目标面源码**。前沿对照：Koka `with` = 表达式（E.31-173）/ OCaml 5 `perform e` = 表达式 / Rust if/match = 表达式（E.31-174）——三先例全部表达式位。
+
+**三方案**：
+- **方案①（审计推荐）**：v9.1 增 `if_expr/match_expr/perform_expr/handle_expr` 入 expr 层级（primary 位）——对齐内核表达力 + 三先例 + 皮肤字典完备性；代价 = 定稿域产消变更（走 M1 开窗先例：用户指令/切换窗窗内裁定）+ Reader 复杂度 +（stmt/expr 双位消歧义务：语句位分号 vs 表达式位值的统一——Rust 同型先例可抄）；
+- **方案②**：表达式位分支/效应走宏 `if!/match!/perform!`（十二替代表延伸——§9.17.2 族）+ 皮肤字典加排除注记 + parity 语料边界声明（S-expr 嵌套效应语料 = 切换窗排除域或先脱糖中转）；代价 = 宏模板承载求值时序重排的语义证明义务（SemanticProof 成员）；
+- **方案③**：语句化 = 刻意设计裁定（语句边界 = 效应边界的形式化纪律——副作用显式化）+ 皮肤字典对称性缺口申报（`(+ 1 (perform E))` 类语料声明为「S-expr 面超集」+ 迁移期文档指引 let 中转）；代价 = 双面表达力不对称成为永久宪法条款（与原则 31 皮肤/骨架同构主张的张力须明示）。
+
+**本轮裁定**：登记不实施（定稿域产消变更需开窗信号——M1 第十三例先例口径：用户指令 = 需求信号本体 r74；本轮用户指令为审计指令非实施指令）；**切换窗六步前置清单第 1 步「完整语法规范」的达标状态附条件**：设计面就位 + B2 三方案待裁——开窗前必选其一，禁止沉默维持。
+
+#### 9.42.5 一致性验证与 8 原语不变性第十四轮验证
+
+①与 §9.26（r104 v9 定稿）关系 = 审计深化轮（九源收敛不动 + 五处注记级修复 + 一处 P1 登记）——零整合裁定推翻；②与 §9.40（r118 问答重验）关系 = 同族审计线（知识重验→流程审查→**文法审计**三审计链闭环）；③与 §9.41（r118 流程审查）关系 = S7 文法一致性哨兵（「EBNF 与 Reader 实现对账」义务）的**设计面先行动作**——本轮审计即 S7 的规范侧输入；④与 DLG5-Parser（§9.38.3 Pratt parselets）关系 = 下游协同（Pratt 优先级数值表以 §9.26.4 为单源——本轮物理修复未触及优先级表 = 零下游失效）；⑤与 02 §8.13（lang-design 权威定稿位）关系 = **双侧同步义务**：本轮五处物理修复 + 例 26/27 须同步至 02 §8.13（本机边界——同步义务登记，lang-design 面由用户侧 kerf 仓库执行）；⑥8 原语不变性**第十四轮验证**：纯文档域零代码变更、零新原语零通道零 VM 变更、词法补全与 where 挂接为注记级/结构级修正（产消语义零变更——where_clause 原已定义仅未挂接；escape 扩展为可选形态追加）。
+
+#### 9.42.6 与既有线程关系
+
+语法线程（r104 v9 定稿 → r111 例 23-25 → 本轮**审计闭环**：B1/B4 缺口闭合 + B2 三方案登记 + 记法/词法/死产生式七处物理修复）→ v9.8 收敛；审计线程（r118 两审计 → 本轮文法审计 = **三审计链完备**：知识重验/流程审查/文法审计）；切换窗线程（六步前置清单第 1 步附条件达成——B2 待裁）；理论载体环数维持（零新理论环——纯文法工程面）；原创贡献维持 25 项（零新增——审计轮不产生新理论贡献）。**sop 反哺**：无需新增条款（文法审计 = §8.4.5 查询表「EBNF 定稿/语法整合」行的既有覆盖域——r104 已注册第 23 条；本轮零 SOP 缺口发现——唯一候选 B2 三方案属设计文档域非流程域）。
+
+#### 9.42.7 v9.8 收敛终态
+
+**用户四问总答**：①Stage 0 EBNF——清晰 ✅（三层组织自解释）/ 精要 ✅（53 产消零冗余）/ 不缺失 ⚠️ 基本达标（4×P3 欠账：词法留白/关键字清单未内联/syntax_rules 差异未注记/handler_body CFG 重叠未注记——全部登记 reviews/ebnf-review.md §2.3）/ 理由 ✅（核心+派生层 100% 覆盖）；②Stage 2+ EBNF——精要 ✅（22 词面经济学 + 脱糖路径 + 分层门控）/ 优雅 ✅（容器模型唯一签名通道 + 九源收敛档案 + 六策略消歧）/ **不缺失修复后 ⚠️**（P1×2：B1 已物理修复 / B2 三方案登记待裁；P2×5 全修复；P3×10 全登记）/ 理由覆盖 64%→修复后 ~85%（剩余 P3 级欠账以本节裁定表补位——「禁得起推敲」的边界诚实声明）；③唯一可信源——Stage 0 成立（§9.16.3 唯一 + R4 代码权威锚）/ Stage 2+ 成立附条件（§9.26 五位一体 + 双侧架构显式声明 + 本机同步边界如实登记）；④语义理由——见 ②覆盖率行 + reviews/ebnf-review.md §3.5 四域统计表。
+
+**版本链**：v9.7（r118 双审计吸收）→ **v9.8（r119 EBNF 双语法审计吸收——本节）**：物理修复 7 处 + 例 26/27 + 登记态 10 项 + 撤回 1 项 + 双侧同步义务 1 项。交付面 = 本节 + reviews/ebnf-review.md + 附录 E.31（检索证八锚）+ 附录 F.36（吸收对照）+ 附录 G v7（收敛注记）。
+
+## 附录 F：吸收对照表增量（F.34 / F.35 正式回填——v9.8 R4 顺修：原编号 F.31/F.32 与第三十五/三十六轮历史附录冲突，本增补两节改号 F.34/F.35 以恢复附录编号唯一性）
+
+### F.34 第三十九-四十轮吸收对照（v9.7——全量问答知识重验与裁定收紧）
+
+第四十轮（用户第三十九轮指令）完成全量问答知识重验吸收：**72 问 / 54 检索 / 修正 15（C1-C15）/ 降格 13 / 维持 44**。吸收落位：
+
+| 段 | 论题 | 吸收落位 | 增量性质 |
+|---|---|---|---|
+| 全卷 | 知识重验方法与总量（三卷子代理 + 54 检索 + 72 问三段式） | §9.40.1 + qa/ 三卷 + QA-MASTER-INDEX | 重验方法轮——回溯性裁定收紧 |
+| C1-C15 | 修正裁定十五条（CFG 层循环识别/约束偏序/Plotkin–Pretnar 先例/逆向归约/干涉再发现/贝尔双误/GR 降格/线性检查修正/happens-before/渐进类型锚/弦论类比/NLL 意外验证/Rice 锚/观测等价锚/B+C 推翻） | §9.40.2 | 原创性宣称收紧——零设计推翻 |
+| 降格 13 条 | 物理隐喻数学化/自评分数字族/叙事通胀族全量降格 | §9.40.2 降格清单 + qa/ 各卷 | K-F 分层纪律回溯执行 |
+| GD-1 | one-shot vs multi-shot 裁定缺口 → 即刻裁定 one-shot（OCaml 5 锚） | §9.40.4 | **本轮唯一机制面裁定**（与既有 resume ∈ {0,1} 一致——外部先例锚强化） |
+| GD-2 | `'a` 生命周期参数不可全消 → 逃生舱永久保留 | §9.40.4 | 诚实上限收紧 |
+| R5 顺修 | stale 标记作废（§9.38/§9.39 已存在）+ F.29 编号缺位说明 | §9.40.7 | 文档漂移修正登记 |
+
+### F.35 第四十一轮吸收对照（v9.7——编译流程审查与 Stage 0 级补充）
+
+| 段 | 论题 | 吸收落位 | 增量性质 |
+|---|---|---|---|
+| 全报 | 十维度对照矩阵（达标率 55%）+ 15 项缺陷分级（P0×2/P1×6/P2×5/P3×2） | §9.41.1-§9.41.2 + reviews/stage0-flow-review.md | 验证工程面审查轮——「设计了但没接线」断层定位 |
+| S1-S8 | Stage 0 级补充设计（快照三品类/fuzz 三 target/差分门/查询注册表/基准双门/负路径金字塔/文法哨兵/验证门分级） | §9.41.3 + 审查报告第四章 | 设计级定稿——实施窗口=下轮工程轮；依赖走 §18 门 |
+| 一致性 | 8 原语第十七轮零触及 + 与 r123/DEA-13/sop §2.5.4 对齐 | §9.41.4 | 五项一致性验证全过 |
+
+
+### F.36 第三十八轮吸收对照（v9.8——EBNF 双语法审计与修正吸收）
+
+| 段 | 论题 | 吸收落位 | 增量性质 |
+|---|---|---|---|
+| 全报 | EBNF 双语法审计（载体 11 处定位 + Stage 0 53 产消全读 + v9 定稿域 ~91 产消全读 + 8 主题 24 检索前沿对照） | reviews/ebnf-review.md + §9.42 | 文法面审计轮——三审计链闭环（知识重验/流程审查/文法审计） |
+| C1-C3 | 唯一可信源裁定（Stage 0 §9.16.3 单源成立 / Stage 2+ §9.26 五位一体成立附条件 / 载体地图无幽灵双源） | §9.42.1 | 用户问题第一刀的正面裁定 |
+| B1+B4+B17 | 例 26 条件位 struct-lit 排除 / 例 27 'a vs 'a' 二字符前瞻 / 完备口径修正（22→27） | §9.26.6（物理落位） | P1 二义缺口闭合 + P3 口径漂移顺修 |
+| B3 | where_clause 死产生式修复（四处挂接） | §9.26.2（物理落位） | P2「节点都在链上」违例修复 |
+| B5/B6/B7 | 记法正名注记 / 词法补全（六终结符+unicode_escape+string_char/char_char+raw string 豁免） | §9.16.2 + §9.26.2（物理落位） | P2×3 词法与表述层完备化 |
+| B2 | 表达力三方案登记（推荐①表达式位扩展 / ②宏补位 / ③语句化刻意裁定） | §9.42.4（登记）+ §9.26.2 指针注记 | P1 登记——切换窗开窗前必选其一 |
+| B8-B16 | P3 级十项登记（lvalue/use 嵌套/顶层 expr/定界双轨/签名三态/borrow 硬编码/借用糖层级漂移等） | §9.42.2 处置列（登记态） | 全登记无一沉默 |
+| B22' | 尾下划线疑虑撤回（Rust 实测证伪）+ 反向正名（v9 与 Rust 精确一致） | §9.42.2 | 审计自纠错登记 |
+| 顺修 | 附录 F.31/F.32 编号冲突（上轮双份）改号 F.34/F.35 | 附录 F 增量区标题 | R4 顺修——恢复编号唯一性 |
+| E.31 | 检索证八锚（167-175） | 附录 E.31 | 知识搜索存证 |
+| 一致性 | 8 原语第十四轮验证（纯文档域）+ 双侧同步义务登记（02 §8.13 侧） | §9.42.5 | 零代码变更 + 同步义务显式化 |
+
+---
+
+# 附录 G v6 增补（Addendum 6）——第四十轮知识重验重组问答流
+
+## Part A　问答流程总索引增补（Master Index Update）
+
+| 轮次 | 段号 | 主题（1 行） | 状态 | 落位 |
+|---|---|---|---|---|
+| 第三十九轮（重验） | 全量 | next7-next24 18 文件 72 问知识重验（54 检索） | **已重组**（三卷 + 总集索引） | qa/ 三卷 + QA-MASTER-INDEX + §9.40 |
+| 第四十轮 | GD-1 | one-shot vs multi-shot resume 裁定 | **已重组** | G.29（本增补） |
+| 第四十轮 | 收敛链 | next23→next24 现代自举策略收敛链权威化 | **已重组** | G.30（本增补） |
+
+> **小计核对（v6 增补后）**：已重组问答流 **24 段**（G.1-G.22 原有 22 段 + G.29 + G.30）；未重组指针清单维持 60 段（轮次 9-29——其设计贡献已经 §9.x 主线 + Part 1 总索引充分索引，且本轮 72 问全量三段式重验已覆盖其中全部关键主张的裁定收紧）；总覆盖 24 + 60 = 84 段 + 72 问重验层 = **双层覆盖终态**。
+
+## Part B　两条新重组问答流（G.29 + G.30，伪代码标注）
+
+### G.29　one-shot vs multi-shot resume 裁定（GD-1 缺口的闭合）
+
+**用户问题（next19/next22/next24 交叉追问的沉淀）**：效应能力流形理论赋予 resume 什么语义？不 resume 是否合法？resume 可否多次调用？
+
+**原回答核心 [伪代码/理论叙述层]**：resume ∈ {0,1}——一次挂起至多一次恢复；non-resume = 合法流终止（「效应流的自然休止」）；理论叙述层将 resume 描述为「效应流形的定向演化桥梁」。
+
+**知识重验（54 检索之关键锚）**：OCaml 5 effect handlers 为 **one-shot**（生产实践标准——resume 至多一次，重复 resume 触发异常）；Koka 学术实现支持 multi-shot（resume 值可多次调用——分布式/回溯场景）；Xie & Leijen 2021《Efffect Handlers in Scope》给出两者实现代价对比：multi-shot 需捕获/复制 continuation，one-shot 零拷贝。
+
+**裁定（即刻生效）**：Stage 0-1 采 **one-shot**（与既有 resume ∈ {0,1} 裁定一致——获 OCaml 5 生产先例锚强化）；multi-shot 列 Stage 3+ 登记态（回溯搜索/分布式重放场景——零信号不开窗）。
+
+```rust
+// [伪代码 — 仅作概念示意，非可编译实现]
+enum ResumeState { Pending(Continuation), Consumed }   // one-shot: 状态机强制 ∈ {0,1}
+fn resume(state: &mut ResumeState, v: Value) -> Result<Flow> {
+    match state {
+        ResumeState::Pending(k) => { *state = ResumeState::Consumed; Ok(k.invoke(v)) }
+        ResumeState::Consumed   => Err(EffectError::DoubleResume)   // OCaml 5 同构：重复 resume = 异常
+    }
+}
+```
+
+**验收判据**：①VM 层 ResumeState 状态机单测（Pending→Consumed 单向 + DoubleResume 负路径 ≥3 case）；②与 §9.17.4 resume ∈ {0,1} 零冲突确认；③multi-shot 登记态入 T3+ 触发表。
+
+### G.30　next23 → next24 收敛链：现代自举策略的权威结论（升格裁定）
+
+**用户问题**（next23 Q1 + next24 Q1/Q2 三问同链）：「能否通过前沿现代的编译流程进行 stage0-1 并使用 S 表达式或者更好的选择？」
+
+**收敛链三层演进 [伪代码/理论叙述层标注仅限提案部分]**：
+1. next23 初版提案：B+C 混合（macro_rules! 结构化宏 + salsa 增量编译）——8 周时间表；
+2. next24 批评承认：macro_rules! 是 token 层宏解析不了中缀表达式 / 增量失效是著名难题（rustc 5+ 年）/ 8 周过于乐观 / 直接 AST 构造演示了反例；
+3. next24 终局修正：**S-expr Reader（务实非先进）+ 查询式纯函数 Pass（不做增量但预留）+ 渐进式不变量验证 + TDD + 全量编译**——32-50 周诚实时间表。
+
+**知识重验**：macro_rules! token-tree 限制（users.rust-lang.org 实证）、rustc 增量编译 2016-2021 五年稳定史（internals 论坛）、Zig comptime/Salsa 作为「现代但不适合 Stage 0」的对照锚——next24 的「现代化 = 用最适合当前阶段的技术」获得检索证据全谱系支持。
+
+**裁定（升格）**：本收敛链为 Stage 0-1 自举策略的**权威结论**（supersede next23 初版提案的全部乐观估算；与 §9.32 MSB-A..E + §9.33 MSB-X/Y/Z 双登记共同构成完整演进记录——§9.32 不删除、以 MSB-X 修正版为准的 supersession 纪律沿袭）。
+
+```rust
+// [伪代码 — 仅作概念示意，非可编译实现]
+struct ModernStage0CompilerFinal {                      // next24 终局修正版（权威）
+    reader: IterativeSExprReader,                       // ~400 行迭代式（非 300 递归式）——栈溢出免疫
+    transform: SExprToCoreExpr,                         // 语法-AST 近同构转换
+    queries: CompilerQueries,                           // 五纯函数查询（parse/transform/analyze_effects/compile/verify）
+    invariants: InvariantChecker,                       // 渐进式不变量验证（8 原语语义锚）
+    // 显式 NOT: incremental / proc-macro / parallel    // —— Stage 0 明确排除三件套
+}
+```
+
+**验收判据**：①与 §9.33 MSB-Y ModernStage0Compiler 修正原型逐字段一致；②「显式 NOT 清单」与 §9.33 值得/不值得现代化分治表零冲突；③本 G.30 为 next23/next24 双文件的唯一权威索引入口（后续引用一律指向本条）。
+
+## Part C　Part 4 状态更新与 R5 顺修宣告
+
+- **R5 顺修（本增补正式宣告）**：附录 G v5 增补尾部的「§9.38 主线（待并行子代理补全）」「§9.39 主线（待并行子代理补全）」「F.31 吸收表（待补）」三处 stale 标记**作废**——§9.38（行 15347 起）/§9.39（行 16670 起）均已实体存在，F.31 已由本增补前的 F.31/F.32 正式回填。F.29 编号永久让缺（第三十四轮两段合并登记所致——不回填避免行号漂移）。
+- **Part 4 维持**：60 段未重组指针清单（轮次 9-29）维持——双层覆盖终态声明：主线索引层（Part 1）+ 重验裁定层（qa/ 三卷）已覆盖全部关键主张；后续如需逐段三段式重组，按 §4.3 维护协议第 2 项扩展。
+
+## Part D　维护协议注记（v6）
+
+1. **知识重验纪律**：每五轮设计讨论吸收至少执行一次全量重验（54 检索为本轮基线——后续轮次增量执行）；重验产出的修正裁定为**回溯生效**（supersession 纪律——被修正主张的后续引用以 QA-MASTER-INDEX 裁定为准）。
+2. **双层覆盖**：主线重组（G.x 流）+ 重验层（qa/ 三卷）构成双层覆盖——新语料吸收时两层同步更新。
+3. **伪代码标注**：G.29/G.30 两块代码全部加 `// [伪代码 — 仅作概念示意，非可编译实现]` 首行注释——与附录 G 主体 22 段 + v2-v5 增补规范一致（Tier 2 pseudocode）。
+
+---
+
+## 附录 G v6 增补收敛终态注记
+
+- 本增补引入 **GD-1 one-shot 裁定**（唯一机制面即刻生效项）与 **G.30 收敛链升格**（权威结论索引化）；8 原语不变性第十六轮零触及；不废止任何既有裁定——C1-C15 修正与 13 条降格均为宣称层收紧，机制层全部维持。
+- 与 §9.40/§9.41/F.34/F.35（v9.8 改号后）及 qa/ 三卷 + QA-MASTER-INDEX + reviews/stage0-flow-review.md + reviews/sop-review.md 共同构成 v9.7 交付面；sop v15.0 增补为治理面对应更新（见 kerf-docs/sop.md）。
+- **v9.7 版本终态**：stage0.md = v8.8 基线（r117 第二十九轮）→ v9.1-v9.6（第三十至三十七轮：§9.31-§9.39 + 附录 G v1-v5）→ **v9.7（第四十/四十一轮：§9.40 知识重验 + §9.41 流程审查吸收 + F.31/F.32 回填 + 附录 G v6 + R5 顺修）**。下一轮（next25+ 或工程轮）按 §4.11 吸收纪律与 sop v15 治理同步推进。
+
+# 附录 G v7 增补（Addendum 7）——第三十八轮 EBNF 双语法审计收敛注记
+
+- 本增补为 v9.8 收敛注记：**EBNF 双语法审计闭环**（Stage 0 四问三过一基本过 + Stage 2+ 修复后达标附条件）；物理修复 7 处（例 26/27 + where_clause 四挂接 + 记法正名 + 词法补全 + F 编号顺修）+ B2 三方案登记 + P3 十项登记 + 撤回 1 项（B22'）
+- 与 §9.42 + reviews/ebnf-review.md + 附录 E.31/F.36 共同构成 v9.8 交付面；双侧同步义务（02 §8.13 侧五处修复同步）登记于 §9.42.5-⑤
+- 8 原语不变性第十四轮验证：纯文档域零代码变更零新原语零通道
+- **v9.8 版本终态**：stage0.md = v8.8 基线（r117 第二十九轮）→ v9.1-v9.6（第三十至三十七轮）→ v9.7（r118 双审计吸收：§9.40/§9.41/F.34/F.35/G v6）→ **v9.8（r119 EBNF 双语法审计吸收：§9.42/E.31/F.36/G v7——本增补）**；下一轮入口 = B2 三方案用户裁定 / lang-design 双侧同步 / S1-S8 工程实施轮
