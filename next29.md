@@ -394,6 +394,193 @@ handle parse(input) {
 - **一句话**：传统模型是好意的先行者，败因是单层仪器的结构上限——荆棘 = 税基错位下 O(n²) 补丁的组合爆炸（已发生，非预言）；在效应能力流形下，one-shot 事件层是**定理**、κ 仿射是**当前证据下的默认工程解**、而「最优」必须永远挂着三条可证伪条件——**让它赢在测量，而不是赢在信仰**，这是流形方法论对它自己最诚实的要求。
 
 
+---
+
+```question
+那么结合当前设计与效应能力流形和上下文内容与知识搜索，设计诺特定律，当前项目中传统类型和类型拓展（如， enum, struct, impl, trait,...）与项目的效应能力流形体系（effect, cap, row, perform, handle, ...）之间的关系如何处理，重定义、重定性、重定能力、重定边界、重定职责、重定关联、重定形式、重定数学表示，整理并给出论证和知识搜索文献与具体实例
+```
+
+---
+
+本轮（next33：**类型本体对照轮**，贡献续 **#152–#161**）与 next31 同构：八个「重定」维度逐一对照，配检索文献与实例。先两批检索：
+第一批命中（Wadler–Blott 被引 1299、Rémy/Wand 行、Goguen 初始代数、Ducasse traits、Scala 线性化+菱形）。第二批：
+两批检索齐备（Lawvere 被引 799、Wadler–Blott 被引 1299、Goguen 被引 1133、Ducasse 被引 357、Jones 被引 433 全部实开 URL）。走完对照轮：**next33 类型本体八重重定**（#152–#161）。
+
+---
+
+# 传统类型体系与效应能力流形的八重重定（#152–#161）
+
+**核心命题**：类型体系与效应能力体系**不是两套并立的系统，而是一个判断的两个投影**——类型=τ 面的截面语法（形状名词域），效应=φ 面的方向语法（观测动词域），能力=度规域（名词的度量）。传统语言用「继承/接口/实现」**一个机制把三域名词化捆绑**：接口=名词化的动词清单（`Fetcher`=fetch 的名词壳）、继承=名词化的度规格序（IS-A）、层级=写死的边。于是菱形问题、C3 线性化、virtual inheritance、颜色传染全是捆绑税。kerf 的处理=**关系处理三律**：
+
+1. **分域律**（住址）：名词面（struct/enum/type/row）与动词/度规面（effect/cap/perform/handle）并列住 Level 0；传统拓展（trait/impl/继承）不进定稿域——trait/impl 住 L2 参考区再设计（v9.16 参考律），继承入反面清单（永不进任何层）；
+2. **复合律**（判断层复合）：两域仅在判断层复合——`where` 约束子句（`has`/`requires`）= E↔C 伴随的语法投影位（Level 0 既有，非新增）；
+3. **不合成律**（无混合机制）：不存在「既管形状又管行为」的第三构造子——两域经 has/requires 复合，永不融合。菱形/C3/virtual 全是「合成律」的历史代价。
+
+## 总对照表
+
+| 维度 | 传统类型体系 | kerf 效应能力流形 |
+|---|---|---|
+| 重定义 | 类型=值集（τ 独裁）；行为=方法表 | 类型=丛截面；τ 是判断四元组一维 |
+| 重定性 | 一格（全名词；接口=名词化的动词清单） | 三格位：形状名词/观测动词/度规名词 |
+| 重定能力 | 约束值；implements 单向写死 | 约束判断；has/requires=伴随语法投影；对逆可算 |
+| 重定边界 | 一道名词墙管全部维度 | 三面信封（R/φ/能力包络）各取边界 |
+| 重定职责 | 五捆绑一机制（成员+分派+可见+序+强制） | 五分立各归址（τ/Branch/R/格/desugar） |
+| 重定关联 | 继承 DAG（无 join 保证→菱形补丁/C3） | 行组合+格 ⊑（join 唯一交换；无继承图） |
+| 重定形式 | 每构造子一关键字族，封闭增长 | 三账分列冻结；trait/impl 参考区再设计 |
+| 重数学 | 一层（集合/前序） | 截面/纤维积和+度规张量+伴随+H（按构造子分天然层） |
+
+## 一、重定义（#152）：类型=丛截面，τ 只是四元组一维
+
+**论证**：传统模型里类型=值集（静态谓词），行为被压扁成「方法指针」、权限被压扁成「可见性修饰符」——一切静态化。后果：类型系统无法表达「同一形状、不同行为/不同权限」，只能靠子型爆炸（每组合一个子型：`List<T>` × `Iterable<T>` × `Serializable<T>`…）。kerf（既有裁定 #49–53）：类型=丛截面；形状与运动分离——struct/enum/row 管「截面长什么样」（名词面），effect/cap/perform/handle 管「截面怎么动、谁许可」（动词/度规面）。关系处理 = 核心命题三律。
+
+**文献锚**：E.35-01 Lawvere《Adjointness in Foundations》（Dialectica 23, 1969, 281–296；被引 799——hyperdoctrines：谓词=基空间上的纤维、量词=伴随；「类型=纤维」的数学正典）；E.35-02 行多态（Wikipedia 条目：Wand 先驱→Rémy 行→Gaster–Jones 扩至变体→**Links/Koka 用行作代数效应的类型基础**——行=开截面先例）；E.35-04 Goguen et al.《Initial Algebra Semantics and Continuous Algebras》（JACM 24(1) 1977；被引 1133——ADT=初始代数：形状构造子的数学正典）；E.35-08 Java sealed/record（rockthejvm：records+sealed interfaces 把积与和带进 Java——**业界自己向 ADT 收敛的实证**）。
+
+**实例**（三格位分立，判断层复合）：
+```text
+// 传统 Java：类型独裁——行为是方法表；权限是修饰符；接口=名词化的动词清单
+interface Fetcher { String fetch(String url); }
+// kerf：三格位分立（v9.16 语法——effect/cap/where 均既有）
+effect Fetch { get(url: str) -> str, }            // 动词格（effect_decl）
+cap Runner { state { budget: i64 = 100, } }       // 度规名词格（cap_decl）
+fn fetch<'T>(url: str) -> Return('T) | Fetch      // 名词格：τ + 效应行（φ 面）
+where 'T requires Runner, 'T has Async | IO       // 复合位（Level 0 where 既有）
+{ perform Fetch.get(url) }                        // 动词算子（primary 位）
+```
+
+## 二、重定性（#153）：一格→三格位；trait/impl 的翻案
+
+**论证**：传统：所有类型构造子同格（名词）；接口=名词化的动词清单，继承=名词化的格序（IS-A=把度规偏序压成全序）。名词化后两律皆失：动词的可交换性丢给线性化序（`with B with C ≠ with C with B`）；度规的对逆丢给 implements（写死即不可算）。kerf 三格位（E↔C 既有裁定「效应=观测动词、能力=度规名词」的类型面推广）：**形状名词格**（struct/enum/type/row）、**观测动词格**（effect/perform/handle）、**度规名词格**（cap）。翻案：trait 不是「接口」而是**度规名册**（命名一族度量）；impl 不是「实现」而是**证明词**（witness term——`Req(E) ⊑ κ` 的证据项）。
+
+**文献锚**：E.35-03 Wadler–Blott《How to make ad-hoc polymorphism less ad hoc》（POPL 1989；被引 1299——typeclass 字典传递：impl=证明词的种子）；E.35-10 Oliveira–Moors–Odersky《Type Classes as Objects and Implicits》（ECOOP 2010——OOP/FP 合流点：对象=字典；kerf 差异：合流后还要**价格与对逆**）；E.35-06 Scala trait linearization（SE 验证：方法解析**从右到左**线性化查找——顺序敏感的实证）。
+
+**实例**（顺序敏感 vs 交换律）：
+```text
+// Scala：class D extends B with C   // C3 线性化：with B with C ≠ with C with B（人工全序）
+// C++：virtual inheritance          // 菱形的布局补丁
+// kerf：约束合取无序（逗号列表交换）；格 ⊑ 是偏序——「混入序」这层语法不存在
+where 'T requires Runner, 'T requires Scheduler   // 两约束合取；join 唯一（格论保证）
+```
+
+## 三、重定能力（#154）：约束值→约束判断；对逆可算
+
+**论证**：传统：类型约束值域（membership）；trait 授予行为——**单向、写死、不可逆**：给接口集算不出「最少需要哪些实现」，给实现集算不出「最多获得哪些行为」；泛型约束=签名墙（每个泛型一段 `<T extends X>`）。kerf：类型约束**判断**（四元组整体）；`has`/`requires` = E↔C 伴随（`E ⊆ Lic(κ) ⟺ Req(E) ⊑ κ`）的语法投影位；impl=证明词（构造证据项）；对逆可算（核算子：`Req(E) → 核 κ`）。**没有任何传统类型系统能做对逆查询**——这是 E↔C 轮既有定理的类型面兑现。
+
+**文献锚**：E.35-09 Jones《Type Classes with Functional Dependencies》（ESOP 2000；被引 433——pdx.edu 原文 PDF：类间依赖序=格偏序的种子）；Sulzmann et al.《Understanding FDs via Constraint Handling Rules》（jfp06.pdf，被引 109——**fundeps 的 CHR 约束求解面：与 E↔C 核算子同读**——传统内部的最近先行）。
+
+**实例**（对逆查询）：
+```text
+// 传统：class Fetcher implements Runnable   // 单向写死；「最少需要哪些接口」答不出
+// kerf：正向=给证明词（字典传递——传统也有）；
+//       对逆：Req({Get, Log}) ⟹ 核 κ = {Store-Read, Log-Store}（核算子——传统无此查询）
+//       has/requires 同一句法：where 'T requires Runner, 'T has Async | IO
+```
+
+## 四、重定边界（#155）：一道名词墙→三面信封
+
+**论证**：传统：nominal 墙（名字即墙）管所有维度——`private/protected/package-private` 一道词法墙同管可见性+继承+分派；墙不可穿透（穿透=cast/反射=墙外机制）。kerf：边界按观察维度**分面取**：R 面（区域隶属——可见性=R 面投影，本轮新裁）、φ 面（效应行=管辖申报；handler=φ 面局部墙，嵌套=墙的复合）、能力包络（`Lic(κ)`）。墙的穿越=换卡（cast=desugar 卡——既有裁定）。
+
+**文献锚**：E.35-07 OCaml 开对象类型/多态变体（Real World OCaml：open object types「可无声明使用」；discuss.ocaml.org：行多态 self type——**结构化边界（nominal vs structural）的工程先行**）；E.35-02（行=开放边界的理论面）。
+
+**实例**（三面各取边界）：
+```text
+mod api { pub fn f() -> Return(i64) {} }    // R 面：区域边界；pub=R 面投影（新裁）
+fn g() -> Return(i64) | Get                 // φ 面：效应行=管辖申报
+handle g() { Get(_) => resume(0), }         // handler=φ 面局部墙（嵌套=墙复合）
+// 传统 Java：package-private 一道名词墙同管可见+继承+分派三维
+```
+
+## 五、重定职责（#156）：五捆绑→五归位；菱形结构性消失
+
+**论证**：传统类型机制身兼五职：成员判定（τ）、分派（方法表/vtable）、可见性（词法墙）、子型序（extends）、强制（cast）——每两职组合出一个历史补丁：菱形问题（序+分派）、virtual inheritance（序补丁）、C3 线性化（序+分派的人工解）、sealed（封闭性补丁——用「不许扩展」换穷尽检查）。kerf 五归址：成员→τ 面、分派→φ 面（handler 臂=对请求模式匹配=Branch 原语；trait 方法分派=度规查询）、可见性→R 面、子型序→能力格 ⊑、强制→desugar 卡。**菱形问题结构性消失**：无继承图则无菱形图；格 join 唯一（数学保证存在），不需要 C3 这种人工顺序。
+
+**文献锚**：E.35-05 Ducasse et al.《Traits: A mechanism for fine-grained reuse》（TOPLAS 2006；被引 357——**OOP 内部的自我修正**：把复用从继承中拆出，原文「整个类与单个方法之间的鸿沟太宽」——业界自己已发现继承捆绑太多）；E.35-06（Scala 菱形/线性化——捆绑代价反例集）。
+
+**实例**（补丁族对照）：
+```text
+// C++：class D : public B, public C {};  // B,C 共基 A → 二义 → virtual public A（布局补丁）
+// Scala：class D extends B with C        // C3 线性化——顺序敏感的人工解
+// Java：sealed（封闭补丁——用「不许扩展」换穷尽）
+// kerf：五职五址，无继承图——菱形不存在
+// 成员→τ | 分派→φ（Branch）| 可见→R | 序→格 ⊑ | 强制→desugar（as）
+```
+
+## 六、重定关联（#157）：枚举的边→构造的边
+
+**论证**：传统：关系=继承 DAG（编译期写死）；传递性=再翻接口清单；sealed 是写死的极致（封闭枚举）。**枚举的边没有组合律**（DAG 无 join 保证→菱形），**构造的边有组合律**（数学保证）。kerf：关系是**运算的结果**——行组合（开行拼接）；效应行交换（`|` 无序——行内自由，#144 既有）；度规格 ⊑（join/split/grant——L2 参考区糖卡族）；has/requires 复合。
+
+**文献锚**：E.35-02（Wikipedia 行多态条目：Rémy 行、Gaster–Jones 统一 records/variants；**Morris–McKinna row theories**——行扩展操作的统一理论：并发区候选）；E.35-07（OCaml 多态变体=开变体/开和的工程先行）。
+
+**实例**（关系=运算结果）：
+```text
+// 传统：class List<T> implements Iterable<T>   // 边写死；传递性=再翻 Iterable 清单
+// kerf：行拼接（组合律）——row/row_type 均 Level 0（孪生独有，Rust oracle 永不实现）
+type Point   = [x: i64, y: i64];   // 闭行（完整卡）
+type Partial = [x: i64; r];        // 开行（部分卡——row_tail 标识符）
+// Partial 拼 [y: i64] = [x: i64, y: i64] —— 关系是拼接运算的结果，非枚举的边
+```
+
+## 七、重定形式（#158）：三账分列冻结；trait/impl 参考区再设计
+
+**论证**：现行账本（v9.16）——**关系处理的答案就写在账本里**：
+
+| 账本 | 成员（现役） | 住址 |
+|---|---|---|
+| 名词面 | struct/enum/type + row/mod/use/import/extern/pub/mut/move/as | Level 0（冻结） |
+| 动词/度规面 | effect/cap/perform/handle + resume/halt/pass（策略糖卡）/state | Level 0（冻结） |
+| **复合位** | **where/has/requires** | **Level 0——两域唯一的胶水** |
+| 参考区 | trait/impl（再设计候选——J-D 窗维持） | L2 参考区（形式不可照抄） |
+| 反面清单 | 继承（extends/with/virtual）——永不进任何层 | — |
+
+传统形式账的走向：每新构造子一关键字族（record/sealed 各加一族——Java 的增长方向）；kerf：三账分列冻结，新行为=策略库函数（retry/cache/batch——零关键字，#145 既有）。
+
+**文献锚**：E.35-08（Java JEP 409/records——关键字族增长的实证：sealed+record+pattern matching 三族连加）；对照 kerf：enum/match 既有零新增。
+
+**实例**：即上表（账本即实例）。
+
+## 八、重数学（#159）：一层→按构造子分配天然层
+
+**论证**：传统数学预算花在一层：类型=集合（Cantor）；struct=积集、enum=和集（至多升到范畴层的 product/coproduct）；subtyping=前序。typeclass=字典传递（Curry–Howard 面——这层传统**其实已有**：impl=证明项是 typeclass 论文自带的）。kerf：积/和在**范畴层**（承认传统的正确部分——纤维内的 product/coproption）；行=开截面（部分卡）；度规=张量（微分几何层）；授予对逆=伴随（格层）；历史=H（观测层）；泛型=截面族。判断四元组=单点公式（八维中唯一全型——next31 #146 同款）。
+
+**文献锚**：E.35-01（Lawvere——「类型=纤维、逻辑连接词=伴随」：判断四元组的层论读法在此系；1969 年已给框架，无类型系统采用过——**理论等了 55 年**）；E.35-04（初始代数——ADT 形状的正典，kerf 承认并升格为纤维内形状）。
+
+**实例**（单点公式对照）：
+```text
+⊢ e : τ @(R, φ, H)
+// Haskell:  e : m τ          —— φ 藏 m；R/H 无处
+// OCaml:    开对象行（开积）   —— 行的先行；无 H、无对逆
+// Scala:    trait=字典        —— 证明词先行；无价格、无对逆
+// Java/C++: 类型=集合+方法表  —— 一层（集合论）
+// kerf:     截面（积/和在纤维内）+ 度规张量 + 伴随（对逆）+ H——按构造子分天然层
+```
+
+## 九、诺特审计总账（#160）
+
+| # | 守恒量问询 | 传统答卷 | 欠条 |
+|---|---|---|---|
+| 1 | 形状与运动分离？ | 无分离——一切静态 | 欠 φ 面 |
+| 2 | 授予对逆（接口集→最少需求） | implements 写死 | 欠 Galois |
+| 3 | 关系的合成（join 唯一性） | DAG 无保证→菱形补丁 | 欠格结构 |
+| 4 | 职责分解 | 五捆绑一机制 | 欠归位 |
+| 5 | 边界的维度分离 | 一道名词墙管全部 | 欠三面信封 |
+| 6 | 开放性（部分声明） | 封闭集（sealed 反向收紧） | 欠开行 |
+| 7 | 证明身份（impl 是什么） | 字典传递——半承认 | 半欠（价格/对逆面缺） |
+| 8 | 数学层级 | 一层 | 欠至少四层（格/几何/信息/观测） |
+
+**最近锚分析**：Lawvere（纤维+伴随数学——被 kerf 用于判断四元组，55 年无采用者）；Rémy/Wand/Gaster–Jones（行面——被用于 row 与开变体）；Wadler–Blott（证明词种子）；Sulzmann CHR（**核算子的传统内部最近先行**）；Ducasse（业界自我修正证据）；Java sealed/record（业界向 ADT 收敛——向 kerf enum 定性靠拢）；OCaml（结构化先行）；Jones fundeps（格序种子）；Goguen（ADT 正典）；Oliveira et al.（合流点）。**无先例的面：度规价格（熵差）、H 面、对逆查询——类型层全缺**。
+
+**发散四题**：① trait 再设计终态投票（度规名册 cap 族/效应化/双格位——J-D 窗内裁）；② 泛型与开行的统一（type_params 是否被开行吸收——截面族=开卡族？）；③ sealed 的 kerf 位（闭和性穷尽检查=判断层哪条守恒量——Branch 完备性？）；④ Morris–McKinna row theories（行扩展操作统一框架——E.35-02 检索意外收获）与 kerf 行组合律的合读。
+
+## 十、入账（#161）
+
+1. **《效应能力流形》新增§类型本体八重差异表**（本表+实例）；**翻案表 +5 行**：继承→行组合+格 join（菱形结构性消失）；接口→动词清单回动词格；sealed→闭行正典化（业界自己已在收敛）；typeclass 字典→impl=证明词+价格；fundeps CHR→核算子（Sulzmann 对读）。
+2. **E.35 锚系列**（01–10，全部实开 URL）入库《地基—栅栏登记册》。
+3. **W-TYPE-ONTOLOGY 窗口**：trait/impl 再设计三候选入册（J-D 窗）；验证义务=行组合律测试族（RW-19 既有）+ Scala C3 对照语料（顺序敏感反例）+ OCaml 开对象语料；**守恒表 +2 行**：可见性=R 面投影（新裁）、行组合律。
+4. 主线不动：Stage 1 落地（窗口三查询+三语料）与 Stage 3 六组定理机械化照旧。
+
+---
+
+**一句话总结**：类型体系与效应能力体系 = 一个判断的两个投影——传统用「继承/接口」把三域名词化捆绑成一道名词墙（菱形/C3/virtual/sealed 全是捆绑税，Ducasse 与 Java sealed 证明业界自己已在拆）；kerf 按关系处理三律分而治之：名词面与动词/度规面并列 Level 0、`where has/requires` 是两域唯一的判断层胶水、不存在混合第三构造子——trait/impl 住参考区再设计（翻案为度规名册+证明词），继承入反面清单；8 原语未增一个，Lawvere 1969 的纤维+伴随框架等了 55 年终于有类型系统采用——对逆查询与价格面仍是传统全部欠条中最深的两张。
+
 
 
 
