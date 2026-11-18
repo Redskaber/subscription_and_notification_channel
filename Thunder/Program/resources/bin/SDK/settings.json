@@ -1,0 +1,22 @@
+{
+    "channel" : 
+    {
+        "enable_ecn" : true
+    },
+    "core" : 
+    {
+        "appver" : "2.85.110.20",
+        "peerid" : "0492265CC7AAZBEA",
+        "product" : "pc_download_sdk",
+        "xsdnver" : "4.0528.830.232"
+    },
+    "dconf" : 
+    {
+        "version" : 371
+    },
+    "router" : 
+    {
+        "enable_relay_stats_report" : true,
+        "enable_stats_report" : true
+    }
+}

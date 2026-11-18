@@ -1,0 +1,32 @@
+<root>
+	<node type='ReportEventNode' >
+		<index>5172</index>
+		<processID>4400</processID>
+		<time>1651926600</time>
+		<reporttime>1651926600</reporttime>
+		<extdata>button=exit</extdata>
+		<timestring>22-05-07 20:30:00</timestring>
+		<reporttimestring>22-05-07 20:30:00</reporttimestring>
+		<attribute1>tuopan_rk_click</attribute1>
+		<attribute2/>
+		<cost1>0</cost1>
+		<cost2>0</cost2>
+		<cost3>0</cost3>
+		<cost4>0</cost4>
+	</node>
+	<node type='ReportEventNode' >
+		<index>5168</index>
+		<processID>4400</processID>
+		<time>1651926601</time>
+		<reporttime>1651926601</reporttime>
+		<extdata>exitType=manual,online_time=16.375</extdata>
+		<timestring>22-05-07 20:30:01</timestring>
+		<reporttimestring>22-05-07 20:30:01</reporttimestring>
+		<attribute1>client_all_online_time</attribute1>
+		<attribute2/>
+		<cost1>0</cost1>
+		<cost2>0</cost2>
+		<cost3>0</cost3>
+		<cost4>0</cost4>
+	</node>
+</root>
